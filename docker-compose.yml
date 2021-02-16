@@ -1,0 +1,30 @@
+version: "3.6"
+
+volumes:
+  quotesdata:
+
+networks:
+  localdev:
+    name: localdev
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: mssql
+    restart: unless-stopped
+    volumes:
+      - quotesdata:/var/opt/mssql
+    networks:
+      - localdev
+
+  api:
+    build:
+      context: .
+      dockerfile: src/ServiceQuotes.Api/Dockerfile
+    image: service-quotes/api:local
+    container_name: webapi
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - localdev
