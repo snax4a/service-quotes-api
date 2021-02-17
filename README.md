@@ -1,7 +1,7 @@
 # service-quotes-api
 A `.NET 5.0` WebApi project. Repositories, Swagger, Mapper, Serilog and more implemented. 
 
-![Build, test and CodeQL](https://github.com/yanpitangui/dotnet-api-ServiceQuotes/workflows/CodeQL/badge.svg)
+![Build, test and CodeQL](https://github.com/snax4a/service-quotes-api/workflows/CodeQL/badge.svg)
 
 # How to run
 - Clone/download to your local workplace.
