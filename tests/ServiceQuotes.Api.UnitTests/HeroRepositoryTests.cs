@@ -14,12 +14,12 @@ namespace ServiceQuotes.Api.UnitTests
 {
     public class HeroRepositoryTests
     {
-        private HeroDbContext CreateDbContext(string name)
+        private AppDbContext CreateDbContext(string name)
         {
-            var options = new DbContextOptionsBuilder<HeroDbContext>()
+            var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(name)
             .Options;
-            return new HeroDbContext(options);
+            return new AppDbContext(options);
         }
 
         [Theory]

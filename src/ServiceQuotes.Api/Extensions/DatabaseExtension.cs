@@ -13,17 +13,16 @@ namespace ServiceQuotes.Api.Extensions
 
             if (environment?.EnvironmentName == "Testing")
             {
-                services.AddDbContextPool<HeroDbContext>(o =>
+                services.AddDbContextPool<AppDbContext>(o =>
                 {
                     o.UseSqlite("Data Source=test.db");
                 });
             }
             else
             {
-                services.AddDbContextPool<HeroDbContext>(o =>
+                services.AddDbContextPool<AppDbContext>(o =>
                 {
                     o.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-                    //o.UseInMemoryDatabase(databaseName: "heroesdb");
                 });
             }
 

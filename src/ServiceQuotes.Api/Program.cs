@@ -22,7 +22,7 @@ namespace ServiceQuotes.Api
             try
             {
                 Log.Logger.Information("Application starting up...");
-                var dbContext = services.GetRequiredService<HeroDbContext>();
+                var dbContext = services.GetRequiredService<AppDbContext>();
                 if (dbContext.Database.IsSqlServer())
                 {
                     await dbContext.Database.MigrateAsync();

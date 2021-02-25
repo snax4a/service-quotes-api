@@ -10,11 +10,11 @@ namespace ServiceQuotes.Infrastructure.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
-        protected HeroDbContext Db { get; }
+        protected AppDbContext Db { get; }
 
         protected DbSet<TEntity> DbSet { get; }
 
-        public Repository(HeroDbContext dbContext)
+        public Repository(AppDbContext dbContext)
         {
             Db = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             DbSet = Db.Set<TEntity>();

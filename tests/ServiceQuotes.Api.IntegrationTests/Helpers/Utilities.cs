@@ -15,13 +15,13 @@ namespace ServiceQuotes.Api.IntegrationTests.Helpers
 {
     public static class Utilities
     {
-        public static void InitializeDbForTests(HeroDbContext db)
+        public static void InitializeDbForTests(AppDbContext db)
         {
             db.Heroes.AddRange(GetSeedingHeroes());
             db.SaveChanges();
         }
 
-        public static void ReinitializeDbForTests(HeroDbContext db)
+        public static void ReinitializeDbForTests(AppDbContext db)
         {
             db.Heroes.RemoveRange(db.Heroes);
             InitializeDbForTests(db);
@@ -49,7 +49,7 @@ namespace ServiceQuotes.Api.IntegrationTests.Helpers
                     using (var scope = sp.CreateScope())
                     {
                         var scopedServices = scope.ServiceProvider;
-                        var db = scopedServices.GetRequiredService<HeroDbContext>();
+                        var db = scopedServices.GetRequiredService<AppDbContext>();
                         var logger = scopedServices
                             .GetRequiredService<ILogger<WebApplicationFactory<Startup>>>();
 
@@ -82,7 +82,7 @@ namespace ServiceQuotes.Api.IntegrationTests.Helpers
                     {
                         var scopedServices = scope.ServiceProvider;
                         var db = scopedServices
-                            .GetRequiredService<HeroDbContext>();
+                            .GetRequiredService<AppDbContext>();
                         var logger = scopedServices
                             .GetRequiredService<ILogger<IntegrationTest>>();
                         try

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ServiceQuotes.Infrastructure.Migrations
 {
-    [DbContext(typeof(HeroDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20210215192908_InitialCreate")]
     partial class InitialCreate
     {
