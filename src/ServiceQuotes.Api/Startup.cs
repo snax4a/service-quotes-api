@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
 using ServiceQuotes.Infrastructure.Context;
+using ServiceQuotes.Application.Helpers;
 
 namespace ServiceQuotes.Api
 {
@@ -33,6 +34,11 @@ namespace ServiceQuotes.Api
             //DI Services and Repos
             services.AddScoped<IHeroRepository, HeroRepository>();
             services.AddScoped<IHeroAppService, HeroAppService>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAccountService, AccountService>();
+
+            // configure strongly typed settings object
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             // WebApi Configuration
             services.AddControllers().AddJsonOptions(options =>
@@ -49,9 +55,9 @@ namespace ServiceQuotes.Api
 
             // Swagger settings
             services.AddApiDoc();
+
             // GZip compression
             services.AddCompression();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -9,10 +9,7 @@ using System.Threading.Tasks;
 
 namespace ServiceQuotes.Api.Controllers
 {
-
-    [ApiController]
-    [Route("api/[controller]")]
-    public class HeroController : ControllerBase
+    public class HeroController : BaseController<HeroController>
     {
         private readonly IHeroAppService _heroAppService;
 
