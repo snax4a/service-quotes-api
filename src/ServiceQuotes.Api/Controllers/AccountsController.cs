@@ -65,7 +65,7 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(new { message = "Token revoked" });
         }
 
-        [Authorize]
+        [Authorize(Role.Manager)]
         [HttpGet]
         public async Task<ActionResult<List<GetAccountDTO>>> GetAccounts([FromQuery] GetAccountsFilter filter)
         {

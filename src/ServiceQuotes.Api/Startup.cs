@@ -9,8 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
-using ServiceQuotes.Infrastructure.Context;
 using ServiceQuotes.Application.Helpers;
+using ServiceQuotes.Api.Middleware;
 
 namespace ServiceQuotes.Api
 {
@@ -67,9 +67,17 @@ namespace ServiceQuotes.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            // global error handler
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+
             app.UseCustomSerilogRequestLogging();
             app.UseRouting();
             app.UseApiDoc();
+
+            // custom jwt auth middleware
+            app.UseMiddleware<JwtMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
