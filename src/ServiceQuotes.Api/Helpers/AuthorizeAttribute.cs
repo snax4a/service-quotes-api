@@ -7,23 +7,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public class AuthorizeAttribute : Attribute, IAuthorizationFilter
+namespace ServiceQuotes.Api.Helpers
 {
-    private readonly IList<Role> _roles;
-
-    public AuthorizeAttribute(params Role[] roles)
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
-        _roles = roles ?? new Role[] { };
-    }
+        private readonly IList<Role> _roles;
 
-    public void OnAuthorization(AuthorizationFilterContext context)
-    {
-        var account = (Account)context.HttpContext.Items["Account"];
-        if (account == null || (_roles.Any() && !_roles.Contains(account.Role)))
+        public AuthorizeAttribute(params Role[] roles)
         {
-            // not logged in or role not authorized
-            context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            _roles = roles ?? new Role[] { };
+        }
+
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            var account = (Account)context.HttpContext.Items["Account"];
+            if (account == null || (_roles.Any() && !_roles.Contains(account.Role)))
+            {
+                // not logged in or role not authorized
+                context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            }
         }
     }
 }

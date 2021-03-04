@@ -8,14 +8,10 @@ using ServiceQuotes.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using BC = BCrypt.Net.BCrypt;
 using ServiceQuotes.Application.Exceptions;
-using System.Text;
 using System.Linq;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using ServiceQuotes.Application.Helpers;
 using Microsoft.Extensions.Options;
@@ -101,7 +97,7 @@ namespace ServiceQuotes.Application.Services
                 throw new AppException("Email or password is incorrect");
 
             // authentication successful so generate jwt and refresh tokens
-            var jwtToken = generateJwtToken(account);
+            var jwtToken = Utilities.generateJwtToken(account, _appSettings.Secret);
             var refreshToken = generateRefreshToken(ipAddress);
 
             // save refresh token
@@ -129,7 +125,7 @@ namespace ServiceQuotes.Application.Services
             await _accountRepository.SaveChangesAsync();
 
             // generate new jwt
-            var jwtToken = generateJwtToken(account);
+            var jwtToken = Utilities.generateJwtToken(account, _appSettings.Secret);
 
             var response = _mapper.Map<AuthenticatedAccountDTO>(account);
             response.JwtToken = jwtToken;
@@ -155,20 +151,6 @@ namespace ServiceQuotes.Application.Services
             var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
             if (!refreshToken.IsActive) throw new AppException("Invalid token");
             return (refreshToken, account);
-        }
-
-        private string generateJwtToken(Account account)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", account.Id.ToString()) }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
 
         private RefreshToken generateRefreshToken(string ipAddress)

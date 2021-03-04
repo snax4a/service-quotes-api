@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ServiceQuotes.Api.Helpers;
 using ServiceQuotes.Application.DTOs.Account;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
