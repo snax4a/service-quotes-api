@@ -97,7 +97,7 @@ namespace ServiceQuotes.Application.Services
                 throw new AppException("Email or password is incorrect");
 
             // authentication successful so generate jwt and refresh tokens
-            var jwtToken = Utilities.generateJwtToken(account, _appSettings.Secret);
+            var jwtToken = Utilities.GenerateJwtToken(account, _appSettings.Secret);
             var refreshToken = generateRefreshToken(ipAddress);
 
             // save refresh token
@@ -125,7 +125,7 @@ namespace ServiceQuotes.Application.Services
             await _accountRepository.SaveChangesAsync();
 
             // generate new jwt
-            var jwtToken = Utilities.generateJwtToken(account, _appSettings.Secret);
+            var jwtToken = Utilities.GenerateJwtToken(account, _appSettings.Secret);
 
             var response = _mapper.Map<AuthenticatedAccountDTO>(account);
             response.JwtToken = jwtToken;
