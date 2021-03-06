@@ -7,11 +7,14 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ServiceQuotes.Api.IntegrationTests
 {
     public class HeroControllerTests : IntegrationTest
     {
+        public HeroControllerTests(WebApplicationFactory<Startup> fixture) : base(fixture) { }
+
         #region GET
 
         [Fact]
@@ -143,7 +146,6 @@ namespace ServiceQuotes.Api.IntegrationTests
         }
 
         #endregion
-
 
         #region PUT
 

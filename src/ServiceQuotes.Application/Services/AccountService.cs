@@ -56,6 +56,7 @@ namespace ServiceQuotes.Application.Services
             // map dto to new account object
             var newAccount = _mapper.Map<Account>(dto);
             newAccount.PasswordHash = BC.HashPassword(dto.Password);
+            newAccount.Created = DateTime.Now;
 
             var created = _accountRepository.Create(newAccount);
             await _accountRepository.SaveChangesAsync();
@@ -77,6 +78,7 @@ namespace ServiceQuotes.Application.Services
 
             account.Email = updatedAccount?.Email;
             account.Role = updatedAccount.Role;
+            account.Updated = DateTime.Now;
 
             _accountRepository.Update(account);
             await _accountRepository.SaveChangesAsync();

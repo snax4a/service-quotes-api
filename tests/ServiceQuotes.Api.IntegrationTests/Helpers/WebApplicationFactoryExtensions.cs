@@ -15,6 +15,8 @@ namespace ServiceQuotes.Api.IntegrationTests.Helpers
     public static class WebApplicationFactoryExtensions
     {
         public const string JWTSecret = "testing-jwt-secret";
+        private static readonly object _lock = new object();
+        private static bool _databaseInitialized;
 
         public static WebApplicationFactory<TStartup> BuildApplicationFactory<TStartup>(this WebApplicationFactory<TStartup> factory) where TStartup : class
         {
@@ -32,17 +34,24 @@ namespace ServiceQuotes.Api.IntegrationTests.Helpers
                         var logger = scopedServices
                             .GetRequiredService<ILogger<WebApplicationFactory<TStartup>>>();
 
-                        db.Database.EnsureDeleted();
-                        db.Database.EnsureCreated();
+                        lock (_lock)
+                        {
+                            if (!_databaseInitialized)
+                            {
+                                db.Database.EnsureDeleted();
+                                db.Database.EnsureCreated();
 
-                        try
-                        {
-                            Utilities.InitializeDbForTests(db);
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "An error occurred seeding the " +
-                                                "database with test messages. Error: {Message}", ex.Message);
+                                try
+                                {
+                                    Utilities.InitializeDbForTests(db);
+                                    _databaseInitialized = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.LogError(ex, "An error occurred seeding the " +
+                                                        "database with test messages. Error: {Message}", ex.Message);
+                                }
+                            }
                         }
                     }
                 });
