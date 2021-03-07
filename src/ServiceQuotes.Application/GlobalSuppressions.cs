@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Globalization", "CA1307:Especificar StringComparison", Justification = "<Pendente>", Scope = "member", Target = "~M:ServiceQuotes.Application.Services.HeroAppService.GetAllHeroes(ServiceQuotes.Application.Filters.GetHeroesFilter)~System.Threading.Tasks.Task{System.Collections.Generic.List{ServiceQuotes.Application.DTOs.Hero.GetHeroDTO}}")]
+[assembly: SuppressMessage("Globalization", "CA1307:Especificar StringComparison", Justification = "<Pendente>", Scope = "member", Target = "")]

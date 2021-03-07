@@ -11,7 +11,7 @@ namespace ServiceQuotes.Infrastructure.Context
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<Hero> Heroes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder is null)

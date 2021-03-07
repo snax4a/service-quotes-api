@@ -32,8 +32,6 @@ namespace ServiceQuotes.Api
             services.AddApplicationDbContext(Configuration, Environment);
 
             //DI Services and Repos
-            services.AddScoped<IHeroRepository, HeroRepository>();
-            services.AddScoped<IHeroAppService, HeroAppService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountService, AccountService>();
 

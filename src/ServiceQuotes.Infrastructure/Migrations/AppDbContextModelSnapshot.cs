@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServiceQuotes.Infrastructure.Context;
 
 namespace ServiceQuotes.Infrastructure.Migrations
@@ -53,36 +52,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                             PasswordHash = "$2a$11$RtlK2XAwpq2cY0EOnZlVJOpcM7BKnTbUNy50tZ14D57Og8iZcP5pi",
                             Role = 0
                         });
-                });
-
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Hero", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HeroType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Individuality")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nickname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Team")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Heroes");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Account", b =>
