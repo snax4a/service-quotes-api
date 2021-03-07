@@ -3,6 +3,7 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using BC = BCrypt.Net.BCrypt;
 
 namespace ServiceQuotes.Application.Helpers
 {
@@ -37,6 +38,16 @@ namespace ServiceQuotes.Application.Helpers
             }, out SecurityToken validatedToken);
 
             return (JwtSecurityToken)validatedToken;
+        }
+
+        public static string HashPassword(string password)
+        {
+            return BC.HashPassword(password);
+        }
+
+        public static bool VerifyPassword(string password, string passwordHash)
+        {
+            return BC.Verify(password, passwordHash);
         }
     }
 }

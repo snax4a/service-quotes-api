@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BC = BCrypt.Net.BCrypt;
 using ServiceQuotes.Application.Exceptions;
 using System.Linq;
 using System.Security.Cryptography;
@@ -55,7 +54,7 @@ namespace ServiceQuotes.Application.Services
 
             // map dto to new account object
             var newAccount = _mapper.Map<Account>(dto);
-            newAccount.PasswordHash = BC.HashPassword(dto.Password);
+            newAccount.PasswordHash = Utilities.HashPassword(dto.Password);
             newAccount.Created = DateTime.Now;
 
             var created = _accountRepository.Create(newAccount);
@@ -74,7 +73,7 @@ namespace ServiceQuotes.Application.Services
 
             // hash password if it was entered
             if (!string.IsNullOrEmpty(updatedAccount.Password))
-                account.PasswordHash = BC.HashPassword(updatedAccount.Password);
+                account.PasswordHash = Utilities.HashPassword(updatedAccount.Password);
 
             account.Email = updatedAccount?.Email;
             account.Role = updatedAccount.Role;
@@ -95,7 +94,7 @@ namespace ServiceQuotes.Application.Services
         {
             var account = await _accountRepository.GetByEmail(model.Email);
 
-            if (account == null || !BC.Verify(model.Password, account.PasswordHash))
+            if (account == null || !Utilities.VerifyPassword(model.Password, account.PasswordHash))
                 throw new AppException("Email or password is incorrect");
 
             // authentication successful so generate jwt and refresh tokens

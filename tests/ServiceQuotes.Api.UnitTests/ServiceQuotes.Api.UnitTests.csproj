@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ServiceQuotes.Domain\ServiceQuotes.Domain.csproj" />
+    <ProjectReference Include="..\..\src\ServiceQuotes.Application\ServiceQuotes.Application.csproj" />
     <ProjectReference Include="..\..\src\ServiceQuotes.Infrastructure\ServiceQuotes.Infrastructure.csproj" />
   </ItemGroup>
 

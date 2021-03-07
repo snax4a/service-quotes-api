@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ServiceQuotes.Api\ServiceQuotes.Api.csproj" />
+    <ProjectReference Include="..\..\src\ServiceQuotes.Application\ServiceQuotes.Application.csproj" />
   </ItemGroup>
 
 </Project>
