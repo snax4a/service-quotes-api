@@ -56,4 +56,4 @@ In the root folder, run ``dotnet test``. This command will try to find all test 
 4. Infra
 	- This folder contains all data access repositories, database contexts, anything that reaches for outside data.
 	1. ServiceQuotes.Infrastructure
-		- This project contains the dbcontext, an generic implementation of repository pattern and a Hero(domain class) repository.
+		- This project contains the dbcontext, an generic implementation of repository pattern and a Account(domain class) repository.

@@ -1,16 +1,16 @@
 using ServiceQuotes.Api.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Xunit;
 
 namespace ServiceQuotes.Api.IntegrationTests
 {
-    public class IntegrationTest
+    public abstract class IntegrationTest : IClassFixture<WebApplicationFactory<Startup>>
     {
         protected readonly WebApplicationFactory<Startup> _factory;
 
-        public IntegrationTest()
+        public IntegrationTest(WebApplicationFactory<Startup> fixture)
         {
-            var appFactory = new WebApplicationFactory<Startup>().BuildApplicationFactory();
-            _factory = appFactory;
+            _factory = fixture.BuildApplicationFactory();
         }
     }
 }

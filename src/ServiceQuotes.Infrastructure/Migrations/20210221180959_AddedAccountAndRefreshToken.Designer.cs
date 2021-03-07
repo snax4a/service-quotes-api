@@ -47,36 +47,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Hero", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HeroType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Individuality")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nickname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Team")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Heroes");
-                });
-
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Account", b =>
                 {
                     b.OwnsMany("ServiceQuotes.Domain.Entities.RefreshToken", "RefreshTokens", b1 =>
