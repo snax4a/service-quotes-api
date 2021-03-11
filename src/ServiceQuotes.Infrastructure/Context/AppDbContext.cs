@@ -1,8 +1,6 @@
 ﻿using ServiceQuotes.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using ServiceQuotes.Domain.Entities.Enums;
-using System;
-using BC = BCrypt.Net.BCrypt;
+
 
 namespace ServiceQuotes.Infrastructure.Context
 {
@@ -22,19 +20,9 @@ namespace ServiceQuotes.Infrastructure.Context
                 throw new System.ArgumentNullException(nameof(modelBuilder));
             }
 
-            modelBuilder.Entity<Account>().HasData(
-                new Account
-                {
-                    Id = Guid.NewGuid(),
-                    Email = "manager@service-quotes.com",
-                    PasswordHash = BC.HashPassword("manager12345"),
-                    Role = Role.Manager,
-                    Created = DateTime.UtcNow
-                }
-            );
-
-            // configure CustomerAddress many-to-many joining table composite primary key
-            modelBuilder.Entity<CustomerAddress>().HasKey(ca => new { ca.CustomerId, ca.AddressId });
+            // custom entities configuration
+            modelBuilder.ApplyConfiguration<Account>(new AccountEntityConfiguration());
+            modelBuilder.ApplyConfiguration<CustomerAddress>(new CustomerAddressEntityConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

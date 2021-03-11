@@ -7,11 +7,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Accounts",
-                keyColumn: "Id",
-                keyValue: new Guid("7542b6b8-638c-44c9-806b-0040667c32a9"));
-
             migrationBuilder.AlterColumn<string>(
                 name: "PasswordHash",
                 table: "Accounts",
@@ -94,11 +89,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Accounts",
-                columns: new[] { "Id", "Created", "Email", "PasswordHash", "Role", "Updated" },
-                values: new object[] { new Guid("86ebebec-154d-471b-9ee6-fef31418cc2c"), new DateTime(2021, 3, 10, 18, 12, 36, 454, DateTimeKind.Utc).AddTicks(6000), "manager@service-quotes.com", "$2a$11$0VoTXJxA0icz/yHHKL0l/ubAPP.IzlKBrBTJhGw2Z.9wbSyR4qlGm", 0, null });
-
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerAddresses_AddressId",
                 table: "CustomerAddresses",
@@ -121,11 +111,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
             migrationBuilder.DropTable(
                 name: "Customers");
 
-            migrationBuilder.DeleteData(
-                table: "Accounts",
-                keyColumn: "Id",
-                keyValue: new Guid("86ebebec-154d-471b-9ee6-fef31418cc2c"));
-
             migrationBuilder.AlterColumn<string>(
                 name: "PasswordHash",
                 table: "Accounts",
@@ -141,11 +126,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
-
-            migrationBuilder.InsertData(
-                table: "Accounts",
-                columns: new[] { "Id", "Created", "Email", "PasswordHash", "Role", "Updated" },
-                values: new object[] { new Guid("7542b6b8-638c-44c9-806b-0040667c32a9"), new DateTime(2021, 3, 1, 22, 46, 58, 919, DateTimeKind.Utc).AddTicks(9540), "manager@service-quotes.com", "$2a$11$RtlK2XAwpq2cY0EOnZlVJOpcM7BKnTbUNy50tZ14D57Og8iZcP5pi", 0, null });
         }
     }
 }

@@ -49,10 +49,10 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("86ebebec-154d-471b-9ee6-fef31418cc2c"),
-                            Created = new DateTime(2021, 3, 10, 18, 12, 36, 454, DateTimeKind.Utc).AddTicks(6000),
+                            Id = new Guid("7542b6b8-638c-44c9-806b-0040667c32a9"),
+                            Created = new DateTime(2021, 3, 1, 22, 46, 58, 919, DateTimeKind.Utc).AddTicks(9540),
                             Email = "manager@service-quotes.com",
-                            PasswordHash = "$2a$11$0VoTXJxA0icz/yHHKL0l/ubAPP.IzlKBrBTJhGw2Z.9wbSyR4qlGm",
+                            PasswordHash = "$2a$11$RtlK2XAwpq2cY0EOnZlVJOpcM7BKnTbUNy50tZ14D57Og8iZcP5pi",
                             Role = 0
                         });
                 });
