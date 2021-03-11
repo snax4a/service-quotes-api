@@ -2,12 +2,16 @@ using ServiceQuotes.Domain.Core.Entities;
 using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServiceQuotes.Domain.Entities
 {
     public class Account : Entity
     {
+        [Required]
         public string Email { get; set; }
+
+        [Required]
         public string PasswordHash { get; set; }
         public Role Role { get; set; }
         public DateTime Created { get; set; }
