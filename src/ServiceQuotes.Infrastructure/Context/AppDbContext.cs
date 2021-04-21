@@ -1,8 +1,6 @@
 ﻿using ServiceQuotes.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using ServiceQuotes.Domain.Entities.Enums;
-using System;
-using BC = BCrypt.Net.BCrypt;
+
 
 namespace ServiceQuotes.Infrastructure.Context
 {
@@ -11,6 +9,9 @@ namespace ServiceQuotes.Infrastructure.Context
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<CustomerAddress> CustomerAddresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,16 +20,9 @@ namespace ServiceQuotes.Infrastructure.Context
                 throw new System.ArgumentNullException(nameof(modelBuilder));
             }
 
-            modelBuilder.Entity<Account>().HasData(
-                new Account
-                {
-                    Id = Guid.NewGuid(),
-                    Email = "manager@service-quotes.com",
-                    PasswordHash = BC.HashPassword("manager12345"),
-                    Role = Role.Manager,
-                    Created = DateTime.UtcNow
-                }
-            );
+            // custom entities configuration
+            modelBuilder.ApplyConfiguration<Account>(new AccountEntityConfiguration());
+            modelBuilder.ApplyConfiguration<CustomerAddress>(new CustomerAddressEntityConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

@@ -57,3 +57,15 @@ In the root folder, run ``dotnet test``. This command will try to find all test 
 	- This folder contains all data access repositories, database contexts, anything that reaches for outside data.
 	1. ServiceQuotes.Infrastructure
 		- This project contains the dbcontext, an generic implementation of repository pattern and a Account(domain class) repository.
+
+# Migrations
+1. To add migration on this project, run the following command on the root folder:
+	- ``dotnet ef migrations add InitialCreate --startup-project ./src/ServiceQuotes.Api --project ./src/ServiceQuotes.Infrastructure``
+
+    This command will set the entrypoint for the migration (the responsible to selecting the dbprovider { sqlserver, mysql, etc } and the connection string) and the project itself will be the infrastructure, which is where the dbcontext is.
+
+2. To update database run the following command on the root folder:
+    - ``dotnet ef database update --startup-project ./src/ServiceQuotes.Api --project ./src/ServiceQuotes.Infrastructure``
+    
+    Note that if you are running database and api in docker containers and your connection string in appsettings.json points to the internal docker network host you will have to pass connection string as a parameter which points to the exposed database port on your localhost for example:
+    - ``dotnet ef database update --startup-project ./src/ServiceQuotes.Api --project ./src/ServiceQuotes.Infrastructure --connection "Server=127.0.0.1;Database=master;User=sa;Password=DevDbPassword123"``
