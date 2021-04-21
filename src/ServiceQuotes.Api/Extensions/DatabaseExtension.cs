@@ -22,7 +22,7 @@ namespace ServiceQuotes.Api.Extensions
             {
                 services.AddDbContextPool<AppDbContext>(o =>
                 {
-                    o.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                    o.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
                 });
             }
 

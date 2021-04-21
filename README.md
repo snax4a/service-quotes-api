@@ -8,8 +8,8 @@ A `.NET 5.0` WebApi project. Repositories, Swagger, Mapper, Serilog and more imp
 - Download the latest .NET SDK and Visual Studio/Code.
 
 ## Standalone
-1. You may need a running instance of MsSQL, with appropriate migrations initialized.
-	- If you want, you can change the DatabaseExtension to use UseInMemoryDatabase, instead of Mssql.
+1. You may need a running instance of PostgreSQL, with appropriate migrations initialized.
+	- If you want, you can change the DatabaseExtension to use UseInMemoryDatabase, instead of PostgreSQL.
 2. Go to the src/ServiceQuotes.Api folder and run ``dotnet run``, or, in visual studio set the api project as startup and run as console or docker (not IIS).
 3. Visit http://localhost:5000/api-docs or https://localhost:5001/api-docs to access the application's swagger.
 
