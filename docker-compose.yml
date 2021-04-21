@@ -9,11 +9,11 @@ networks:
 
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    container_name: mssql
+    image: postgres:13
+    container_name: postgresql
     restart: unless-stopped
     volumes:
-      - quotesdata:/var/opt/mssql
+      - quotesdata:/var/lib/postgresql/data
     networks:
       - localdev
 

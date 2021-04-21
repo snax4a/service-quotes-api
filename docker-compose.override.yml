@@ -3,10 +3,11 @@ version: "3.6"
 services:
   db:
     ports:
-      - 1433:1433
+      - 5432:5432
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=DevDbPassword123
+      - POSTGRES_DB=sq_db
+      - POSTGRES_USER=service_quotes
+      - POSTGRES_PASSWORD=DevDbPassword123
 
   api:
     environment:
