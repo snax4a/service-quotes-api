@@ -23,7 +23,7 @@ namespace ServiceQuotes.Api
             {
                 Log.Logger.Information("Application starting up...");
                 var dbContext = services.GetRequiredService<AppDbContext>();
-                if (dbContext.Database.IsSqlServer())
+                if (dbContext.Database.IsNpgsql())
                 {
                     await dbContext.Database.MigrateAsync();
                 }
