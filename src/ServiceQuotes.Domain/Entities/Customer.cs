@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace ServiceQuotes.Domain.Entities
 {
@@ -27,5 +28,27 @@ namespace ServiceQuotes.Domain.Entities
         public string VatNumber { get; set; }
 
         public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; }
+
+        public void AddAddress(Guid addressId)
+        {
+            var existingAddress = CustomerAddresses.FirstOrDefault(ca => ca.AddressId == addressId);
+            if (existingAddress != null)
+                return;
+
+            CustomerAddresses.Add(new CustomerAddress
+            {
+                AddressId = addressId,
+                CustomerId = this.Id
+            });
+        }
+
+        public void RemoveAddress(Guid addressId)
+        {
+            var addressToRemove = CustomerAddresses.FirstOrDefault(ca => ca.AddressId == addressId);
+            if (addressToRemove != null)
+            {
+                CustomerAddresses.Remove(addressToRemove);
+            }
+        }
     }
 }
