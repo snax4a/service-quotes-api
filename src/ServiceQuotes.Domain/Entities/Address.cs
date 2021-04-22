@@ -23,13 +23,6 @@ namespace ServiceQuotes.Domain.Entities
         [MaxLength(30)]
         public string Street { get; set; }
 
-        [Required]
-        [MaxLength(5)]
-        public string BuildingNumber { get; set; }
-
-        [MaxLength(5)]
-        public string ApartmentNumber { get; set; }
-
         [Phone]
         [Required]
         [MaxLength(11)]

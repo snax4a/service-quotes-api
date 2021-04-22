@@ -14,6 +14,7 @@ namespace ServiceQuotes.Domain.Entities
         [Required]
         public string PasswordHash { get; set; }
         public Role Role { get; set; }
+        public byte[] Image { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
