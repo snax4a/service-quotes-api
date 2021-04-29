@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace ServiceQuotes.Application.DTOs.Account
 {
-    public class AuthenticatedAccountDTO
+    public class AuthenticatedAccountResponse
     {
         public Guid Id { get; set; }
         public string Email { get; set; }

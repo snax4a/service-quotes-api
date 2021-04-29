@@ -1,74 +1,63 @@
-﻿using ServiceQuotes.Domain.Core.Entities;
-using ServiceQuotes.Domain.Core.Interfaces;
-using ServiceQuotes.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using ServiceQuotes.Domain.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Infrastructure.Repositories
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected AppDbContext Db { get; }
+        protected readonly DbContext _context;
+        protected readonly DbSet<TEntity> _entities;
 
-        protected DbSet<TEntity> DbSet { get; }
-
-        public Repository(AppDbContext dbContext)
+        public Repository(DbContext context)
         {
-            Db = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            DbSet = Db.Set<TEntity>();
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _entities = context.Set<TEntity>();
         }
 
-        public virtual IQueryable<TEntity> GetAll()
+        public async Task<TEntity> Get(params object[] keyValues)
         {
-            return DbSet.AsNoTracking();
+            return await _entities.FindAsync(keyValues);
         }
 
-        public virtual async Task<TEntity> GetById(Guid id)
+        public async Task<IEnumerable<TEntity>> GetAll()
         {
-            return await DbSet
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(e => e.Id == id);
+            return await _entities.ToListAsync();
         }
 
-        public virtual TEntity Create(TEntity entity)
+        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            DbSet.Add(entity);
-            return entity;
+            return await _entities.Where(predicate).ToListAsync();
         }
 
-        public virtual TEntity Update(TEntity entity)
+        public async Task<TEntity> SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
         {
-            DbSet.Update(entity);
-            return entity;
+            return await _entities.SingleOrDefaultAsync(predicate);
         }
 
-        public virtual async Task Delete(Guid id)
+        public void Add(TEntity entity)
         {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                DbSet.Remove(entity);
-            }
-
+            if (entity is null) throw new ArgumentNullException(nameof(entity));
+            _entities.Add(entity);
         }
 
-        public async Task<int> SaveChangesAsync() => await Db.SaveChangesAsync();
-
-        public void Dispose()
+        public void AddRange(IEnumerable<TEntity> entities)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            _entities.AddRange(entities);
         }
 
-
-        protected virtual void Dispose(bool disposing)
+        public void Remove(TEntity entity)
         {
-            if (disposing)
-            {
-                Db.Dispose();
-            }
+            _entities.Remove(entity);
+        }
+
+        public void RemoveRange(IEnumerable<TEntity> entities)
+        {
+            _entities.RemoveRange(entities);
         }
     }
 }

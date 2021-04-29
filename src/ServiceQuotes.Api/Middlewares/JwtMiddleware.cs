@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using ServiceQuotes.Application.Helpers;
 using ServiceQuotes.Domain.Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Api.Middleware
@@ -26,7 +24,7 @@ namespace ServiceQuotes.Api.Middleware
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-            if (token != null)
+            if (token is not null)
                 await attachAccountToContext(context, accountRepository, token);
 
             await _next(context);
@@ -40,7 +38,7 @@ namespace ServiceQuotes.Api.Middleware
                 var accountId = Guid.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
                 // attach account to context on successful jwt validation
-                context.Items["Account"] = await accountRepository.GetById(accountId);
+                context.Items["Account"] = await accountRepository.Get(accountId);
             }
             catch
             {

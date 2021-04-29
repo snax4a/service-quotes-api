@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServiceQuotes.Application.DTOs.Account
 {
-    public class CreateAccountDTO
+    public class CreateAccountRequest
     {
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }

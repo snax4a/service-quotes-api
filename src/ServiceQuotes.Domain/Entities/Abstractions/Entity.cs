@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ServiceQuotes.Domain.Core.Entities
+namespace ServiceQuotes.Domain.Entities.Abstractions
 {
     public abstract class Entity
     {

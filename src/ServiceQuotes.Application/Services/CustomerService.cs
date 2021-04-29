@@ -1,78 +1,123 @@
 ﻿using AutoMapper;
-using ServiceQuotes.Application.Extensions;
+using LinqKit;
+using ServiceQuotes.Application.DTOs.Customer;
+using ServiceQuotes.Application.DTOs.CustomerAddress;
+using ServiceQuotes.Application.Exceptions;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
+using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Entities;
-using ServiceQuotes.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ServiceQuotes.Application.Exceptions;
-using ServiceQuotes.Application.Helpers;
-using Microsoft.Extensions.Options;
-using ServiceQuotes.Application.DTOs.Customer;
 
 namespace ServiceQuotes.Application.Services
 {
     public class CustomerService : ICustomerService
     {
-
         private readonly IMapper _mapper;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly AppSettings _appSettings;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CustomerService(IMapper mapper, ICustomerRepository customerRepository, IOptions<AppSettings> appSettings)
+        public CustomerService(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
-            _customerRepository = customerRepository;
-            _appSettings = appSettings.Value;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<GetCustomerDTO>> GetAllCustomers(GetCustomersFilter filter)
+        public async Task<List<GetCustomerResponse>> GetAllCustomers(GetCustomersFilter filter)
         {
-            var customers = _customerRepository
-                .GetAll()
-                .WhereIf(!string.IsNullOrEmpty(filter?.CompanyName), x => EF.Functions.Like(x.CompanyName, $"%{filter.CompanyName}%"))
-                .WhereIf(!string.IsNullOrEmpty(filter?.VatNumber), x => EF.Functions.Like(x.VatNumber, $"%{filter.VatNumber}%"));
-            return await _mapper.ProjectTo<GetCustomerDTO>(customers).ToListAsync();
+            // prepare filter predicate
+            var predicate = PredicateBuilder.New<Customer>(true);
+
+            if (!string.IsNullOrEmpty(filter?.SearchString))
+            {
+                predicate = predicate.Or(p => p.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.VatNumber.ToLower().Contains(filter.SearchString.ToLower()));
+            }
+
+            var customers = await _unitOfWork.Customers.Find(predicate);
+
+            return _mapper.Map<List<GetCustomerResponse>>(customers);
         }
 
-        public async Task<GetCustomerDTO> GetCustomerById(Guid id)
+        public async Task<GetCustomerWithAddressesResponse> GetCustomerById(Guid id)
         {
-            return _mapper.Map<GetCustomerDTO>(await _customerRepository.GetById(id));
+            var customer = await _unitOfWork.Customers.GetWithAddresses(id);
+            return _mapper.Map<GetCustomerWithAddressesResponse>(customer);
         }
 
-        public async Task<GetCustomerDTO> CreateCustomer(CreateCustomerDTO dto)
+        public async Task<GetCustomerResponse> CreateCustomer(CreateCustomerRequest dto)
         {
             // validate
-            if (await _customerRepository.GetByCompanyName(dto.CompanyName) != null)
+            if (await _unitOfWork.Customers.GetByCompanyName(dto.CompanyName) is not null)
                 throw new AppException($"Customer '{dto.CompanyName}' already exists.");
 
             // map dto to new customer object
             var newCustomer = _mapper.Map<Customer>(dto);
 
-            var created = _customerRepository.Create(newCustomer);
-            await _customerRepository.SaveChangesAsync();
-            return _mapper.Map<GetCustomerDTO>(created);
+            _unitOfWork.Customers.Add(newCustomer);
+            _unitOfWork.Commit();
+
+            return _mapper.Map<GetCustomerResponse>(newCustomer);
         }
 
-        public async Task<GetCustomerDTO> UpdateCustomer(Guid id, UpdateCustomerDTO updatedCustomer)
+        public async Task<GetCustomerResponse> UpdateCustomer(Guid id, UpdateCustomerRequest dto)
         {
-            var customer = await _customerRepository.GetById(id);
-            if (customer == null) return null;
+            var customer = await _unitOfWork.Customers.Get(id);
 
             // validate
-            var doesCompanyExist = await _customerRepository.GetByCompanyName(updatedCustomer.CompanyName) != null;
-            if (customer.CompanyName != updatedCustomer.CompanyName && doesCompanyExist)
-                throw new AppException($"Customer '{updatedCustomer.CompanyName}' already exists.");
+            if (customer is null) throw new KeyNotFoundException();
 
-            customer.CompanyName = updatedCustomer?.CompanyName;
-            customer.VatNumber = updatedCustomer?.VatNumber;
+            if (!string.IsNullOrEmpty(dto.CompanyName) && customer.CompanyName != dto.CompanyName)
+            {
+                if (await _unitOfWork.Customers.GetByCompanyName(dto.CompanyName) is not null)
+                    throw new AppException($"Customer '{dto.CompanyName}' already exists.");
 
-            _customerRepository.Update(customer);
-            await _customerRepository.SaveChangesAsync();
-            return _mapper.Map<GetCustomerDTO>(customer);
+                customer.CompanyName = dto.CompanyName;
+            }
+
+            if (!string.IsNullOrEmpty(dto.VatNumber) && customer.VatNumber != dto.VatNumber)
+                customer.VatNumber = dto.VatNumber;
+
+            _unitOfWork.Commit();
+            return _mapper.Map<GetCustomerResponse>(customer);
+        }
+
+        public async Task<GetCustomerAddressWithCustomerResponse> GetAddressById(Guid customerId, Guid addressId)
+        {
+            var customerAddress = await _unitOfWork.CustomerAddresses.GetWithCustomerAndAddress(customerId, addressId);
+            return _mapper.Map<GetCustomerAddressWithCustomerResponse>(customerAddress);
+        }
+
+        public async Task<GetCustomerAddressWithCustomerResponse> CreateAddress(Guid customerId, CreateAddressRequest dto)
+        {
+            // validate
+            if (await _unitOfWork.CustomerAddresses.GetByCustomerIdAndName(customerId, dto.Name) is not null)
+                throw new AppException($"Address: '{dto.Name}' already exist.");
+
+            // map dto to new address object
+            var address = _mapper.Map<Address>(dto);
+            var customerAddress = new CustomerAddress()
+            {
+                CustomerId = customerId,
+                AddressId = address.Id,
+                Address = address,
+                Name = dto.Name
+            };
+
+            _unitOfWork.CustomerAddresses.Add(customerAddress);
+            _unitOfWork.Commit();
+
+            return await GetAddressById(customerId, address.Id);
+        }
+
+        public async Task DeleteAddress(Guid customerId, Guid addressId)
+        {
+            var customerAddress = await _unitOfWork.CustomerAddresses.Get(customerId, addressId);
+            if (customerAddress is null) throw new KeyNotFoundException();
+
+            _unitOfWork.CustomerAddresses.Remove(customerAddress);
+            _unitOfWork.Commit();
         }
 
         public void Dispose()
@@ -85,7 +130,7 @@ namespace ServiceQuotes.Application.Services
         {
             if (disposing)
             {
-                _customerRepository.Dispose();
+                _unitOfWork.Dispose();
             }
         }
     }

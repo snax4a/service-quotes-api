@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServiceQuotes.Application.DTOs.Account
 {
-    public class AuthenticateDTO
+    public class AuthenticateRequest
     {
         [Required]
         [EmailAddress]

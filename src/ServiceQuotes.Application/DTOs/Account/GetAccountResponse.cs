@@ -1,13 +1,12 @@
-﻿using ServiceQuotes.Domain.Entities.Enums;
-using System;
+﻿using System;
 
 namespace ServiceQuotes.Application.DTOs.Account
 {
-    public class GetAccountDTO
+    public class GetAccountResponse
     {
         public Guid Id { get; set; }
         public string Email { get; set; }
-        public Role Role { get; set; }
+        public string Role { get; set; }
         public DateTime? Created { get; set; }
         public DateTime? Updated { get; set; }
     }

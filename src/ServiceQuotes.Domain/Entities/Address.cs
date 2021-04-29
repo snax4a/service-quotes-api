@@ -1,6 +1,7 @@
-using ServiceQuotes.Domain.Core.Entities;
+using ServiceQuotes.Domain.Entities.Abstractions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ServiceQuotes.Domain.Entities
 {
@@ -28,6 +29,7 @@ namespace ServiceQuotes.Domain.Entities
         [MaxLength(11)]
         public string PhoneNumber { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; }
     }
 }

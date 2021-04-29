@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ServiceQuotes.Domain.Core.Entities;
+using ServiceQuotes.Domain.Entities.Abstractions;
 using System;
 
 namespace ServiceQuotes.Domain.Entities

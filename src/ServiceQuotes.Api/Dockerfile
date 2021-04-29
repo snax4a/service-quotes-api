@@ -10,7 +10,6 @@ WORKDIR /src
 COPY ["src/ServiceQuotes.Api/ServiceQuotes.Api.csproj", "src/ServiceQuotes.Api/"]
 COPY ["src/ServiceQuotes.Application/ServiceQuotes.Application.csproj", "src/ServiceQuotes.Application/"]
 COPY ["src/ServiceQuotes.Domain/ServiceQuotes.Domain.csproj", "src/ServiceQuotes.Domain/"]
-COPY ["src/ServiceQuotes.Domain.Core/ServiceQuotes.Domain.Core.csproj", "src/ServiceQuotes.Domain.Core/"]
 COPY ["src/ServiceQuotes.Infrastructure/ServiceQuotes.Infrastructure.csproj", "src/ServiceQuotes.Infrastructure/"]
 COPY . .
 WORKDIR "/src/src/ServiceQuotes.Api"

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ServiceQuotes.Application.DTOs.Account;
 using ServiceQuotes.Application.DTOs.Customer;
+using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Domain.Entities;
 
 namespace ServiceQuotes.Application.MappingProfiles
@@ -10,16 +11,27 @@ namespace ServiceQuotes.Application.MappingProfiles
         public MappingProfile()
         {
             /// Account Map
-            CreateMap<Account, GetAccountDTO>().ReverseMap();
-            CreateMap<CreateAccountDTO, Account>();
-            CreateMap<UpdateAccountDTO, Account>();
-            CreateMap<Account, AuthenticatedAccountDTO>();
+            CreateMap<Account, GetAccountResponse>().ReverseMap();
+            CreateMap<CreateAccountRequest, Account>();
+            CreateMap<UpdateAccountRequest, Account>();
+            CreateMap<Account, AuthenticatedAccountResponse>();
             ///
 
             /// Customer Map
-            CreateMap<Customer, GetCustomerDTO>().ReverseMap();
-            CreateMap<CreateCustomerDTO, Customer>();
-            CreateMap<UpdateCustomerDTO, Customer>();
+            CreateMap<Customer, GetCustomerResponse>().ReverseMap();
+            CreateMap<Customer, GetCustomerWithAddressesResponse>();
+            CreateMap<CreateCustomerRequest, Customer>();
+            CreateMap<UpdateCustomerRequest, Customer>();
+            ///
+
+            /// Address Map
+            CreateMap<CreateAddressRequest, Address>();
+            CreateMap<Address, GetAddressResponse>();
+            ///
+
+            /// CustomerAddress Map
+            CreateMap<CustomerAddress, GetCustomerAddressResponse>();
+            CreateMap<CustomerAddress, GetCustomerAddressWithCustomerResponse>();
             ///
         }
     }

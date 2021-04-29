@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServiceQuotes.Api.Helpers;
 using ServiceQuotes.Application.DTOs.Account;
+using ServiceQuotes.Application.Exceptions;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain.Entities.Enums;
@@ -30,8 +31,8 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [HttpPost("authenticate")]
-        [ProducesResponseType(typeof(AuthenticatedAccountDTO), 200)]
-        public async Task<ActionResult<AuthenticatedAccountDTO>> Authenticate(AuthenticateDTO dto)
+        [ProducesResponseType(typeof(AuthenticatedAccountResponse), 200)]
+        public async Task<ActionResult<AuthenticatedAccountResponse>> Authenticate(AuthenticateRequest dto)
         {
             var response = await _accountService.Authenticate(dto, ipAddress());
             setTokenCookie(response.RefreshToken);
@@ -39,8 +40,8 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [HttpPost("refresh-token")]
-        [ProducesResponseType(typeof(AuthenticatedAccountDTO), 200)]
-        public async Task<ActionResult<AuthenticatedAccountDTO>> RefreshToken()
+        [ProducesResponseType(typeof(AuthenticatedAccountResponse), 200)]
+        public async Task<ActionResult<AuthenticatedAccountResponse>> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
             var response = await _accountService.RefreshToken(refreshToken, ipAddress());
@@ -50,7 +51,7 @@ namespace ServiceQuotes.Api.Controllers
 
         [Authorize]
         [HttpPost("revoke-token")]
-        public async Task<IActionResult> RevokeToken(RevokeTokenDTO model)
+        public async Task<IActionResult> RevokeToken(RevokeTokenRequest model)
         {
             // accept token from request body or cookie
             var token = model.Token ?? Request.Cookies["refreshToken"];
@@ -68,7 +69,7 @@ namespace ServiceQuotes.Api.Controllers
 
         [Authorize(Role.Manager)]
         [HttpGet]
-        public async Task<ActionResult<List<GetAccountDTO>>> GetAccounts([FromQuery] GetAccountsFilter filter)
+        public async Task<ActionResult<List<GetAccountResponse>>> GetAccounts([FromQuery] GetAccountsFilter filter)
         {
             return Ok(await _accountService.GetAllAccounts(filter));
         }
@@ -77,8 +78,8 @@ namespace ServiceQuotes.Api.Controllers
         [HttpGet("{id:guid}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(typeof(GetAccountDTO), 200)]
-        public async Task<ActionResult<GetAccountDTO>> GetAccountById(Guid id)
+        [ProducesResponseType(typeof(GetAccountResponse), 200)]
+        public async Task<ActionResult<GetAccountResponse>> GetAccountById(Guid id)
         {
             // users can get their own account and Managers can get any account
             if (id != Account.Id && Account.Role != Role.Manager)
@@ -92,7 +93,7 @@ namespace ServiceQuotes.Api.Controllers
         [Authorize(Role.Manager)]
         [HttpPost]
         [ProducesResponseType(201)]
-        public async Task<ActionResult<GetAccountDTO>> CreateAccount(CreateAccountDTO dto)
+        public async Task<ActionResult<GetAccountResponse>> CreateAccount(CreateAccountRequest dto)
         {
             var newAccount = await _accountService.CreateAccount(dto);
             return CreatedAtAction("GetAccountById", new { id = newAccount.Id }, newAccount);
@@ -103,23 +104,13 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]
-        public async Task<ActionResult<GetAccountDTO>> UpdateAccount(Guid id, [FromBody] UpdateAccountDTO dto)
+        public async Task<ActionResult<GetAccountResponse>> UpdateAccount(Guid id, [FromBody] UpdateAccountRequest dto)
         {
             // users can update their own account and Managers can update any account
             if (id != Account.Id && Account.Role != Role.Manager)
                 return Unauthorized(new { message = "Unauthorized" });
 
-            // only Managers can update role
-            if (Account.Role != Role.Manager)
-                dto.Role = Account.Role;
-
-            var updatedAccount = await _accountService.UpdateAccount(id, dto);
-
-            if (updatedAccount == null)
-            {
-                return NotFound();
-            }
-
+            await _accountService.UpdateAccount(id, dto);
             return NoContent();
         }
 
@@ -134,9 +125,8 @@ namespace ServiceQuotes.Api.Controllers
             if (id != Account.Id && Account.Role != Role.Manager)
                 return Unauthorized(new { message = "Unauthorized" });
 
-            var deleted = await _accountService.DeleteAccount(id);
-            if (deleted) return NoContent();
-            else return NotFound();
+            await _accountService.DeleteAccount(id);
+            return NoContent();
         }
 
         // helper methods
