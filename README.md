@@ -68,4 +68,4 @@ In the root folder, run ``dotnet test``. This command will try to find all test 
     - ``dotnet ef database update --startup-project ./src/ServiceQuotes.Api --project ./src/ServiceQuotes.Infrastructure``
     
     Note that if you are running database and api in docker containers and your connection string in appsettings.json points to the internal docker network host you will have to pass connection string as a parameter which points to the exposed database port on your localhost for example:
-    - ``dotnet ef database update --startup-project ./src/ServiceQuotes.Api --project ./src/ServiceQuotes.Infrastructure --connection "Server=127.0.0.1;Database=master;User=sa;Password=DevDbPassword123"``
+    - ``dotnet ef database update --startup-project ./src/ServiceQuotes.Api --project ./src/ServiceQuotes.Infrastructure --connection "Server=127.0.0.1;Port=5432;Database=sq_db;User Id=service_quotes;Password=DevDbPassword123;"``

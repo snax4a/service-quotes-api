@@ -12,6 +12,8 @@ namespace ServiceQuotes.Infrastructure.Context
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerAddress> CustomerAddresses { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Specialization> Specializations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,9 +22,13 @@ namespace ServiceQuotes.Infrastructure.Context
                 throw new System.ArgumentNullException(nameof(modelBuilder));
             }
 
+            // todo fix/add account,customers,addresses configurations
             // custom entities configuration
             modelBuilder.ApplyConfiguration<Account>(new AccountEntityConfiguration());
             modelBuilder.ApplyConfiguration<CustomerAddress>(new CustomerAddressEntityConfiguration());
+            modelBuilder.ApplyConfiguration<Employee>(new EmployeeEntityConfiguration());
+            modelBuilder.ApplyConfiguration<Specialization>(new SpecializationEntityConfiguration());
+            modelBuilder.ApplyConfiguration<EmployeeSpecialization>(new EmployeeSpecializationEntityConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
