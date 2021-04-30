@@ -357,3 +357,5 @@ test.db
 https/
 
 .DS_Store
+
+.idea/*
