@@ -1,8 +1,10 @@
-﻿using System;
+﻿using ServiceQuotes.Application.DTOs.CustomerAddress;
+using System;
+using System.Collections.Generic;
 
 namespace ServiceQuotes.Application.DTOs.Customer
 {
-    public class GetCustomerDTO
+    public class GetCustomerResponse
     {
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }

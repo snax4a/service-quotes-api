@@ -48,11 +48,11 @@ In the root folder, run ``dotnet test``. This command will try to find all test 
 2. Application
 	-  This folder stores all data transformations between your api and your domain layer. It also contains your business logic.
 3. Domain
-	- This folder contains your business models, enums and common interfaces.
-	1. ServiceQuotes.Domain.Core
-		- Contains the base entity for all other domain entities, as well as the interface for the repository implementation.
-	1. ServiceQuotes.Domain
-		- Contains business models and enums.
+	- This folder contains common interfaces like UoW interface.
+	1. ServiceQuotes.Domain.Entities
+		- This folder contains base entity, business models, enums.
+	2. ServiceQuotes.Domain.Repositories
+		- This folder contains repositories interfaces.
 4. Infra
 	- This folder contains all data access repositories, database contexts, anything that reaches for outside data.
 	1. ServiceQuotes.Infrastructure

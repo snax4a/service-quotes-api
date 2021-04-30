@@ -22,7 +22,7 @@ namespace ServiceQuotes.Api.Helpers
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var account = (Account)context.HttpContext.Items["Account"];
-            if (account == null || (_roles.Any() && !_roles.Contains(account.Role)))
+            if (account is null || (_roles.Any() && !_roles.Contains(account.Role)))
             {
                 // not logged in or role not authorized
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };

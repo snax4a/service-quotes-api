@@ -6,7 +6,4 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5"/>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ServiceQuotes.Domain.Core\ServiceQuotes.Domain.Core.csproj"/>
-  </ItemGroup>
 </Project>

@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ServiceQuotes.Domain.Entities;
-using System;
 using ServiceQuotes.Domain.Entities.Enums;
+using System;
 
-namespace ServiceQuotes.Infrastructure.Context
+namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
 {
     public class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
     {

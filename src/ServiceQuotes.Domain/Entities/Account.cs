@@ -1,4 +1,4 @@
-using ServiceQuotes.Domain.Core.Entities;
+using ServiceQuotes.Domain.Entities.Abstractions;
 using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ namespace ServiceQuotes.Domain.Entities
         [Required]
         public string PasswordHash { get; set; }
         public Role Role { get; set; }
+        public byte[] Image { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }

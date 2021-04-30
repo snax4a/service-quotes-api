@@ -29,6 +29,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3"/>
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.6.3"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.5"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.5"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceQuotes.Application\ServiceQuotes.Application.csproj"/>

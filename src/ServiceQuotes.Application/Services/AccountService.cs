@@ -1,55 +1,63 @@
 ﻿using AutoMapper;
+using LinqKit;
+using Microsoft.Extensions.Options;
 using ServiceQuotes.Application.DTOs.Account;
-using ServiceQuotes.Application.Extensions;
+using ServiceQuotes.Application.Exceptions;
 using ServiceQuotes.Application.Filters;
+using ServiceQuotes.Application.Helpers;
 using ServiceQuotes.Application.Interfaces;
+using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Entities;
-using ServiceQuotes.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using ServiceQuotes.Application.Exceptions;
 using System.Linq;
 using System.Security.Cryptography;
-using ServiceQuotes.Application.Helpers;
-using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace ServiceQuotes.Application.Services
 {
     public class AccountService : IAccountService
     {
-
         private readonly IMapper _mapper;
-        private readonly IAccountRepository _accountRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly AppSettings _appSettings;
 
-        public AccountService(IMapper mapper, IAccountRepository accountRepository, IOptions<AppSettings> appSettings)
+        public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
-            _accountRepository = accountRepository;
+            _unitOfWork = unitOfWork;
             _appSettings = appSettings.Value;
         }
 
-        public async Task<List<GetAccountDTO>> GetAllAccounts(GetAccountsFilter filter)
+        public async Task<List<GetAccountResponse>> GetAllAccounts(GetAccountsFilter filter)
         {
-            var accounts = _accountRepository
-                .GetAll()
-                .WhereIf(!string.IsNullOrEmpty(filter?.Email), x => EF.Functions.Like(x.Email, $"%{filter.Email}%"))
-                .WhereIf(filter?.Role != null, x => x.Role == filter.Role);
-            return await _mapper.ProjectTo<GetAccountDTO>(accounts)
-                .ToListAsync();
+            // prepare filter predicate
+            var predicate = PredicateBuilder.New<Account>(true);
+
+            if (!string.IsNullOrEmpty(filter?.SearchString))
+            {
+                predicate = predicate.Or(p => p.Email.ToLower().Contains(filter.SearchString.ToLower()));
+            }
+
+            if (filter?.Role is not null)
+            {
+                predicate = predicate.And(p => p.Role == filter.Role);
+            }
+
+            var accounts = await _unitOfWork.Accounts.Find(predicate);
+
+            return _mapper.Map<List<GetAccountResponse>>(accounts);
         }
 
-        public async Task<GetAccountDTO> GetAccountById(Guid id)
+        public async Task<GetAccountResponse> GetAccountById(Guid id)
         {
-            return _mapper.Map<GetAccountDTO>(await _accountRepository.GetById(id));
+            return _mapper.Map<GetAccountResponse>(await _unitOfWork.Accounts.Get(id));
         }
 
-        public async Task<GetAccountDTO> CreateAccount(CreateAccountDTO dto)
+        public async Task<GetAccountResponse> CreateAccount(CreateAccountRequest dto)
         {
             // validate
-            if (await _accountRepository.GetByEmail(dto.Email) != null)
+            if (await _unitOfWork.Accounts.GetByEmail(dto.Email) != null)
                 throw new AppException($"Email '{dto.Email}' is already taken");
 
             // map dto to new account object
@@ -57,44 +65,49 @@ namespace ServiceQuotes.Application.Services
             newAccount.PasswordHash = Utilities.HashPassword(dto.Password);
             newAccount.Created = DateTime.Now;
 
-            var created = _accountRepository.Create(newAccount);
-            await _accountRepository.SaveChangesAsync();
-            return _mapper.Map<GetAccountDTO>(created);
+            _unitOfWork.Accounts.Add(newAccount);
+            _unitOfWork.Commit();
+
+            return _mapper.Map<GetAccountResponse>(newAccount);
         }
 
-        public async Task<GetAccountDTO> UpdateAccount(Guid id, UpdateAccountDTO updatedAccount)
+        public async Task<GetAccountResponse> UpdateAccount(Guid id, UpdateAccountRequest dto)
         {
-            var account = await _accountRepository.GetById(id);
-            if (account == null) return null;
-
-            // validate
-            if (account.Email != updatedAccount.Email && await _accountRepository.GetByEmail(updatedAccount.Email) != null)
-                throw new AppException($"Email '{updatedAccount.Email}' is already taken");
+            var account = await _unitOfWork.Accounts.Get(id);
+            if (account is null) throw new KeyNotFoundException();
 
             // hash password if it was entered
-            if (!string.IsNullOrEmpty(updatedAccount.Password))
-                account.PasswordHash = Utilities.HashPassword(updatedAccount.Password);
+            if (!string.IsNullOrEmpty(dto.Password))
+                account.PasswordHash = Utilities.HashPassword(dto.Password);
 
-            account.Email = updatedAccount?.Email;
-            account.Role = updatedAccount.Role;
+            if (!string.IsNullOrEmpty(dto.Email) && account.Email != dto.Email)
+            {
+                if (await _unitOfWork.Accounts.GetByEmail(dto.Email) is not null)
+                    throw new AppException($"Email '{dto.Email}' is already taken");
+
+                account.Email = dto.Email;
+            }
+
             account.Updated = DateTime.Now;
+            _unitOfWork.Commit();
 
-            _accountRepository.Update(account);
-            await _accountRepository.SaveChangesAsync();
-            return _mapper.Map<GetAccountDTO>(account);
+            return _mapper.Map<GetAccountResponse>(account);
         }
 
-        public async Task<bool> DeleteAccount(Guid id)
+        public async Task DeleteAccount(Guid id)
         {
-            await _accountRepository.Delete(id);
-            return await _accountRepository.SaveChangesAsync() > 0;
+            var account = await _unitOfWork.Accounts.Get(id);
+            if (account is null) throw new KeyNotFoundException();
+
+            _unitOfWork.Accounts.Remove(account);
+            _unitOfWork.Commit();
         }
 
-        public async Task<AuthenticatedAccountDTO> Authenticate(AuthenticateDTO model, string ipAddress)
+        public async Task<AuthenticatedAccountResponse> Authenticate(AuthenticateRequest dto, string ipAddress)
         {
-            var account = await _accountRepository.GetByEmail(model.Email);
+            var account = await _unitOfWork.Accounts.GetByEmail(dto.Email);
 
-            if (account == null || !Utilities.VerifyPassword(model.Password, account.PasswordHash))
+            if (account is null || !Utilities.VerifyPassword(dto.Password, account.PasswordHash))
                 throw new AppException("Email or password is incorrect");
 
             // authentication successful so generate jwt and refresh tokens
@@ -103,16 +116,15 @@ namespace ServiceQuotes.Application.Services
 
             // save refresh token
             account.RefreshTokens.Add(refreshToken);
-            _accountRepository.Update(account);
-            await _accountRepository.SaveChangesAsync();
+            _unitOfWork.Commit();
 
-            var response = _mapper.Map<AuthenticatedAccountDTO>(account);
+            var response = _mapper.Map<AuthenticatedAccountResponse>(account);
             response.JwtToken = jwtToken;
             response.RefreshToken = refreshToken.Token;
             return response;
         }
 
-        public async Task<AuthenticatedAccountDTO> RefreshToken(string token, string ipAddress)
+        public async Task<AuthenticatedAccountResponse> RefreshToken(string token, string ipAddress)
         {
             var (refreshToken, account) = await getRefreshToken(token);
 
@@ -122,13 +134,13 @@ namespace ServiceQuotes.Application.Services
             refreshToken.RevokedByIp = ipAddress;
             refreshToken.ReplacedByToken = newRefreshToken.Token;
             account.RefreshTokens.Add(newRefreshToken);
-            _accountRepository.Update(account);
-            await _accountRepository.SaveChangesAsync();
+
+            _unitOfWork.Commit();
 
             // generate new jwt
             var jwtToken = Utilities.GenerateJwtToken(account.Id, _appSettings.Secret);
 
-            var response = _mapper.Map<AuthenticatedAccountDTO>(account);
+            var response = _mapper.Map<AuthenticatedAccountResponse>(account);
             response.JwtToken = jwtToken;
             response.RefreshToken = newRefreshToken.Token;
             return response;
@@ -141,14 +153,13 @@ namespace ServiceQuotes.Application.Services
             // revoke token and save
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
-            _accountRepository.Update(account);
-            await _accountRepository.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();
         }
 
         private async Task<(RefreshToken, Account)> getRefreshToken(string token)
         {
-            var account = await _accountRepository.GetByRefreshToken(token);
-            if (account == null) throw new AppException("Invalid token");
+            var account = await _unitOfWork.Accounts.GetByRefreshToken(token);
+            if (account is null) throw new AppException("Invalid token");
             var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
             if (!refreshToken.IsActive) throw new AppException("Invalid token");
             return (refreshToken, account);
@@ -184,7 +195,7 @@ namespace ServiceQuotes.Application.Services
         {
             if (disposing)
             {
-                _accountRepository.Dispose();
+                _unitOfWork.Dispose();
             }
         }
 

@@ -1,6 +1,6 @@
-﻿using ServiceQuotes.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
+using ServiceQuotes.Domain.Entities;
+using ServiceQuotes.Infrastructure.Context.EntityConfigurations;
 
 namespace ServiceQuotes.Infrastructure.Context
 {

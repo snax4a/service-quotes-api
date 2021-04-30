@@ -13,21 +13,14 @@ namespace ServiceQuotes.Infrastructure.Repositories
 
         public async Task<Account> GetByEmail(string email)
         {
-            return await DbSet
-                        .AsNoTracking()
-                        .SingleOrDefaultAsync(a => a.Email == email);
+            return await _entities.SingleOrDefaultAsync(a => a.Email == email);
         }
 
         public async Task<Account> GetByRefreshToken(string token)
         {
-            return await DbSet
-                        .AsNoTracking()
-                        .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
-        }
-
-        public int GetAccountsCount()
-        {
-            return DbSet.AsNoTracking().Count();
+            return await _entities
+                        .Include(a => a.RefreshTokens)
+                        .SingleOrDefaultAsync(a => a.RefreshTokens.Any(t => t.Token == token));
         }
     }
 }

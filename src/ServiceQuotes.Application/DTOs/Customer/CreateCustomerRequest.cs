@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServiceQuotes.Application.DTOs.Customer
 {
-    public class CreateCustomerDTO
+    public class CreateCustomerRequest
     {
         [Required(ErrorMessage = "Account is required")]
         public Guid AccountId { get; set; }

@@ -1,14 +1,14 @@
-﻿using ServiceQuotes.Api.IntegrationTests.Helpers;
-using FluentAssertions;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ServiceQuotes.Api.IntegrationTests.Helpers;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
-using System;
 
 namespace ServiceQuotes.Api.IntegrationTests
 {
@@ -62,7 +62,7 @@ namespace ServiceQuotes.Api.IntegrationTests
             var client = _factory.RebuildDb().CreateClientWithAuth(accountId);
 
             // Act
-            var response = await client.GetAsync("/api/accounts?role=Customer");
+            var response = await client.GetAsync("/api/accounts?searchString=customer@test.com");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -81,7 +81,7 @@ namespace ServiceQuotes.Api.IntegrationTests
             var client = _factory.RebuildDb().CreateClientWithAuth(accountId);
 
             // Act
-            var response = await client.GetAsync("/api/accounts?Email=not.existing@email.com");
+            var response = await client.GetAsync("/api/accounts?searchString=not.existing@email.com");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);

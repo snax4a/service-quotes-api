@@ -1,16 +1,17 @@
-using ServiceQuotes.Api.Extensions;
-using ServiceQuotes.Application.Interfaces;
-using ServiceQuotes.Application.Services;
-using ServiceQuotes.Domain.Repositories;
-using ServiceQuotes.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Text.Json.Serialization;
-using ServiceQuotes.Application.Helpers;
+using ServiceQuotes.Api.Extensions;
 using ServiceQuotes.Api.Middleware;
+using ServiceQuotes.Application.Helpers;
+using ServiceQuotes.Application.Interfaces;
+using ServiceQuotes.Application.Services;
+using ServiceQuotes.Domain;
+using ServiceQuotes.Domain.Repositories;
+using ServiceQuotes.Infrastructure;
+using ServiceQuotes.Infrastructure.Repositories;
 
 namespace ServiceQuotes.Api
 {
@@ -32,6 +33,7 @@ namespace ServiceQuotes.Api
             services.AddApplicationDbContext(Configuration, Environment);
 
             //DI Services and Repos
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -41,11 +43,9 @@ namespace ServiceQuotes.Api
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             // WebApi Configuration
-            services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.IgnoreNullValues = true;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // for enum as strings
-            });
+            services.AddControllers().AddNewtonsoftJson(
+                options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             // AutoMapper settings
             services.AddAutoMapperSetup();

@@ -1,4 +1,5 @@
 ﻿using ServiceQuotes.Application.DTOs.Customer;
+using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.Filters;
 using System;
 using System.Collections.Generic;
@@ -8,12 +9,16 @@ namespace ServiceQuotes.Application.Interfaces
 {
     public interface ICustomerService : IDisposable
     {
-        Task<List<GetCustomerDTO>> GetAllCustomers(GetCustomersFilter filter);
+        Task<List<GetCustomerResponse>> GetAllCustomers(GetCustomersFilter filter);
 
-        Task<GetCustomerDTO> GetCustomerById(Guid id);
+        Task<GetCustomerWithAddressesResponse> GetCustomerById(Guid id);
 
-        Task<GetCustomerDTO> CreateCustomer(CreateCustomerDTO customer);
+        Task<GetCustomerResponse> CreateCustomer(CreateCustomerRequest customer);
 
-        Task<GetCustomerDTO> UpdateCustomer(Guid id, UpdateCustomerDTO updatedCustomer);
+        Task<GetCustomerResponse> UpdateCustomer(Guid id, UpdateCustomerRequest updatedCustomer);
+
+        Task<GetCustomerAddressWithCustomerResponse> GetAddressById(Guid customerId, Guid addressId);
+
+        Task<GetCustomerAddressWithCustomerResponse> CreateAddress(Guid customerId, CreateAddressRequest address);
     }
 }
