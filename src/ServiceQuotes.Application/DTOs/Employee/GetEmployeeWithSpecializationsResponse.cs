@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ServiceQuotes.Application.DTOs.Employee
 {
-    public class GetEmployeeWithSpecializations
+    public class GetEmployeeWithSpecializationsResponse
     {
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }
