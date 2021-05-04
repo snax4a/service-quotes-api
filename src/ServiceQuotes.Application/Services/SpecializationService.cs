@@ -8,7 +8,6 @@ using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Application.Services

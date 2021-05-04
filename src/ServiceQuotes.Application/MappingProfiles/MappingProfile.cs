@@ -3,6 +3,7 @@ using ServiceQuotes.Application.DTOs.Account;
 using ServiceQuotes.Application.DTOs.Customer;
 using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.Specialization;
 using ServiceQuotes.Domain.Entities;
 
 namespace ServiceQuotes.Application.MappingProfiles
@@ -40,6 +41,11 @@ namespace ServiceQuotes.Application.MappingProfiles
             CreateMap<Employee, GetEmployeeWithSpecializationsResponse>();
             CreateMap<CreateEmployeeRequest, Employee>();
             CreateMap<UpdateEmployeeRequest, Employee>();
+
+            // Specialization Map
+            CreateMap<Specialization, GetSpecializationResponse>().ReverseMap();
+            CreateMap<CreateSpecializationRequest, Specialization>();
+            CreateMap<UpdateSpecializationRequest, Specialization>();
         }
     }
 }
