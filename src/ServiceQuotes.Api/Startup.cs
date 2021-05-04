@@ -39,7 +39,9 @@ namespace ServiceQuotes.Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();
+            services.AddScoped<ISpecializationService, SpecializationService>();
 
             // configure strongly typed settings object
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
