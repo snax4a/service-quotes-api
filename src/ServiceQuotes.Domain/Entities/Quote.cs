@@ -1,4 +1,5 @@
 using ServiceQuotes.Domain.Entities.Abstractions;
+using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 
