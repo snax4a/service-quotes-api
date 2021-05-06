@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LinqKit;
 using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.Specialization;
 using ServiceQuotes.Application.Exceptions;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
@@ -43,7 +44,21 @@ namespace ServiceQuotes.Application.Services
         public async Task<GetEmployeeWithSpecializationsResponse> GetEmployeeById(Guid id)
         {
             var employee = await _unitOfWork.Employees.GetWithSpecializations(id);
-            return _mapper.Map<GetEmployeeWithSpecializationsResponse>(employee);
+
+            return new GetEmployeeWithSpecializationsResponse()
+            {
+                Id = employee.Id,
+                AccountId = employee.AccountId,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Specializations = employee.EmployeeSpecializations
+                    .Select(es => new GetSpecializationResponse()
+                    {
+                        Id = es.Specialization.Id,
+                        Name = es.Specialization.Name
+                    })
+                    .ToList()
+            };
         }
 
         public async Task<GetEmployeeResponse> CreateEmployee(CreateEmployeeRequest dto)
