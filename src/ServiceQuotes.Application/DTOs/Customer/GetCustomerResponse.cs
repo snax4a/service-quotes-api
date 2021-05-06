@@ -1,6 +1,4 @@
-﻿using ServiceQuotes.Application.DTOs.CustomerAddress;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace ServiceQuotes.Application.DTOs.Customer
 {
