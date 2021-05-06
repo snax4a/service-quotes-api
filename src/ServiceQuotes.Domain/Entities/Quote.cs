@@ -1,6 +1,6 @@
-//using ServiceQuotes.Domain.Entities.Abstractions;
-//using System;
-//using System.Collections.Generic;
+using ServiceQuotes.Domain.Entities.Abstractions;
+using System;
+using System.Collections.Generic;
 
 namespace ServiceQuotes.Domain.Entities
 {
