@@ -17,8 +17,6 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
             builder.Property(quote => quote.ReferenceNumber).IsRequired();
 
             builder.Property(quote => quote.Total).HasPrecision(7,2).IsRequired();
-
-            builder.HasIndex("QuoteId").IsUnique();
         }
     }
 }
