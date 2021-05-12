@@ -10,6 +10,7 @@ namespace ServiceQuotes.Domain.Entities
         public ServiceRequest()
         {
             ServiceRequestEmployees = new HashSet<ServiceRequestEmployee>();
+            Materials = new HashSet<Material>();
         }
 
         public string Title { get; set; }
@@ -22,7 +23,7 @@ namespace ServiceQuotes.Domain.Entities
         public Guid AddressId { get; set; }
 
         public virtual CustomerAddress CustomerAddress { get; set; }
-
         public virtual ICollection<ServiceRequestEmployee> ServiceRequestEmployees { get; set; }
+        public virtual ICollection<Material> Materials { get; set; }
     }
 }
