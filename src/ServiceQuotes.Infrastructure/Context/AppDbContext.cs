@@ -14,6 +14,7 @@ namespace ServiceQuotes.Infrastructure.Context
         public DbSet<CustomerAddress> CustomerAddresses { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Specialization> Specializations { get; set; }
+        public DbSet<ServiceRequest> ServiceRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,8 @@ namespace ServiceQuotes.Infrastructure.Context
             modelBuilder.ApplyConfiguration<Employee>(new EmployeeEntityConfiguration());
             modelBuilder.ApplyConfiguration<Specialization>(new SpecializationEntityConfiguration());
             modelBuilder.ApplyConfiguration<EmployeeSpecialization>(new EmployeeSpecializationEntityConfiguration());
+            modelBuilder.ApplyConfiguration<ServiceRequest>(new ServiceRequestEntityConfiguration());
+            modelBuilder.ApplyConfiguration<ServiceRequestEmployee>(new ServiceRequestEmployeeEntityConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
