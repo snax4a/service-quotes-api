@@ -10,6 +10,7 @@ namespace ServiceQuotes.Domain.Entities
         {
             EmployeeSpecializations = new HashSet<EmployeeSpecialization>();
             ServiceRequestEmployees = new HashSet<ServiceRequestEmployee>();
+            ServiceRequestJobValuations = new HashSet<ServiceRequestJobValuation>();
         }
 
         public Guid AccountId { get; set; }
@@ -19,5 +20,6 @@ namespace ServiceQuotes.Domain.Entities
 
         public virtual ICollection<EmployeeSpecialization> EmployeeSpecializations { get; set; }
         public virtual ICollection<ServiceRequestEmployee> ServiceRequestEmployees { get; set; }
+        public virtual ICollection<ServiceRequestJobValuation> ServiceRequestJobValuations { get; set; }
     }
 }

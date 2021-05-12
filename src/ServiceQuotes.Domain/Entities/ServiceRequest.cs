@@ -11,6 +11,7 @@ namespace ServiceQuotes.Domain.Entities
         {
             ServiceRequestEmployees = new HashSet<ServiceRequestEmployee>();
             Materials = new HashSet<Material>();
+            ServiceRequestJobValuations = new HashSet<ServiceRequestJobValuation>();
         }
 
         public string Title { get; set; }
@@ -25,5 +26,6 @@ namespace ServiceQuotes.Domain.Entities
         public virtual CustomerAddress CustomerAddress { get; set; }
         public virtual ICollection<ServiceRequestEmployee> ServiceRequestEmployees { get; set; }
         public virtual ICollection<Material> Materials { get; set; }
+        public virtual ICollection<ServiceRequestJobValuation> ServiceRequestJobValuations { get; set; }
     }
 }
