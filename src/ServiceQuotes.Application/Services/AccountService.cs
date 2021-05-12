@@ -54,6 +54,9 @@ namespace ServiceQuotes.Application.Services
         {
             var account = await _unitOfWork.Accounts.Get(id);
 
+            if (account is null)
+                throw new KeyNotFoundException("Accound does not exist.");
+
             if (account.Role == Role.Customer)
             {
                 var customer = await _unitOfWork.Customers.GetByAccountId(account.Id);
