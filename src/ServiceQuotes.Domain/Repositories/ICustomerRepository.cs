@@ -8,5 +8,6 @@ namespace ServiceQuotes.Domain.Repositories
     {
         Task<Customer> GetByCompanyName(string companyName);
         Task<Customer> GetWithAddresses(Guid id);
+        Task<Customer> GetByAccountId(Guid accountId);
     }
 }

@@ -37,7 +37,7 @@ namespace ServiceQuotes.Api.IntegrationTests
         }
 
         [Fact]
-        public async Task Get_AllAccounts_ReturnsOk_ForUnAuthorizedRole()
+        public async Task Get_AllAccounts_ReturnsUnauthorized_ForUnAuthorizedRole()
         {
             // Arrange
             var accountId = Guid.Parse("8720c542-7784-460a-91ca-31bf633eae50");
@@ -94,7 +94,7 @@ namespace ServiceQuotes.Api.IntegrationTests
         [InlineData("8720c542-7784-460a-91ca-31bf633eae50")]
         [InlineData("8411910e-5d47-40fb-a29b-6ad9dbbd9f63")]
         [InlineData("be95846f-6298-45eb-b732-dddadb2e4f83")]
-        public async Task Get_ExistingSpecificAccount_ReturnsOk(Guid id)
+        public async Task Get_ExistingAccountById_ReturnsOk(Guid id)
         {
             // Arrange
             var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
@@ -118,7 +118,7 @@ namespace ServiceQuotes.Api.IntegrationTests
         [InlineData("7c7b7ab3-456f-484c-b90b-0116443df2aa")]
         [InlineData("5751ca54-3f43-4393-adc9-ad6e69fcdacd")]
         [InlineData("92422c00-7ba8-43e9-8426-8107674761c5")]
-        public async Task Get_NonExistingSpecificAccount_ReturnsNotFound(Guid id)
+        public async Task Get_NonExistingAccountById_ReturnsNotFound(Guid id)
         {
             // Arrange
             var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
@@ -195,7 +195,10 @@ namespace ServiceQuotes.Api.IntegrationTests
             {
                 Email = "new@test.com",
                 Password = "newPassword123",
-                Role = "Customer"
+                RepeatPassword = "newPassword123",
+                Role = "Customer",
+                CompanyName = "Test Company Name",
+                VatNumber = "PL7922298336"
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PostAsync("/api/accounts", content);
@@ -204,15 +207,17 @@ namespace ServiceQuotes.Api.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.Created);
             var json = JObject.Parse(await response.Content.ReadAsStringAsync());
             json["id"].Should().NotBeNull();
-            json["email"].Should().NotBeNull();
-            json["role"].Should().NotBeNull();
+            json["customerId"].Should().NotBeNull();
             json["created"].Should().NotBeNull();
 
+            Assert.Equal("new@test.com", json["email"]);
             Assert.Equal("Customer", json["role"]);
+            Assert.Equal("Test Company Name", json["companyName"]);
+            Assert.Equal("PL7922298336", json["vatNumber"]);
         }
 
         [Fact]
-        public async Task Post_ValidAccount_ReturnsCreated_ForUnAuthorizedRole()
+        public async Task Post_ValidAccount_ReturnsUnauthorized_ForUnAuthorizedRole()
         {
             // Arrange
             var accountId = Guid.Parse("87aed32c-dcf7-45bb-a4e1-57c8c2b7262e");
@@ -223,7 +228,10 @@ namespace ServiceQuotes.Api.IntegrationTests
             {
                 Email = "new@test.com",
                 Password = "newPassword123",
-                Role = "Customer"
+                RepeatPassword = "newPassword123",
+                Role = "Customer",
+                CompanyName = "Test Company",
+                VatNumber = "PL7922298336"
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PostAsync("/api/accounts", content);
@@ -246,7 +254,10 @@ namespace ServiceQuotes.Api.IntegrationTests
             {
                 Email = email,
                 Password = "newPassword123",
-                Role = "Customer"
+                RepeatPassword = "newPassword123",
+                Role = "Customer",
+                CompanyName = "Test Company",
+                VatNumber = "PL7922298336"
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PostAsync("/api/accounts", content);
@@ -271,6 +282,7 @@ namespace ServiceQuotes.Api.IntegrationTests
             {
                 Email = "newaccount@test.com",
                 Password = "",
+                RepeatPassword = "newPassword123",
                 Role = "Customer"
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
@@ -312,8 +324,8 @@ namespace ServiceQuotes.Api.IntegrationTests
             var newAccount = JsonConvert.SerializeObject(new
             {
                 Email = "customer2@test.com",
-                Password = "emp1234",
-                Role = "Employee"
+                Password = "newPassword12435",
+                RepeatPassword = "newPassword12345",
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PutAsync($"/api/accounts/{id}", content);
@@ -333,9 +345,7 @@ namespace ServiceQuotes.Api.IntegrationTests
             // Act
             var newAccount = JsonConvert.SerializeObject(new
             {
-                Email = "manager@test.com",
-                Password = "customer123",
-                Role = "Employee"
+                Email = "manager@test.com"
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PutAsync($"/api/accounts/{id}", content);
@@ -355,44 +365,10 @@ namespace ServiceQuotes.Api.IntegrationTests
             // Act
             var newAccount = JsonConvert.SerializeObject(new
             {
-                Email = "john.doe@test.com",
-                Password = "johndoe123",
-                Role = "Employee"
+                Email = "john.doe@test.com"
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PutAsync($"/api/accounts/{id}", content);
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        #endregion
-
-        #region DELETE
-
-        [Fact]
-        public async Task Delete_ValidAccountId_ReturnsNoContent()
-        {
-            // Arrange
-            var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
-            var client = _factory.RebuildDb().CreateClientWithAuth(accountId);
-
-            // Act
-            var response = await client.DeleteAsync("/api/accounts/8411910e-5d47-40fb-a29b-6ad9dbbd9f63");
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        }
-
-        [Fact]
-        public async Task Delete_InValidAccountId_ReturnsNoContent()
-        {
-            // Arrange
-            var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
-            var client = _factory.RebuildDb().CreateClientWithAuth(accountId);
-
-            // Act
-            var response = await client.DeleteAsync("/api/accounts/eb92e97b-2095-45aa-b0db-7c31370b82f1");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);

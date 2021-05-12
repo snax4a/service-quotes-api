@@ -23,5 +23,10 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .ThenInclude(ca => ca.Address)
                         .SingleOrDefaultAsync(c => c.Id == id);
         }
+
+        public async Task<Customer> GetByAccountId(Guid accountId)
+        {
+            return await _entities.SingleOrDefaultAsync(c => c.AccountId == accountId);
+        }
     }
 }
