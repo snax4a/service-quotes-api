@@ -33,9 +33,9 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(204)]
         public async Task<ActionResult<GetQuoteResponse>> UpdateQuoteStatus(Guid id, [FromBody] UpdateQuoteStatusRequest dto)
         {
-            var employee = await _quoteService.GetQuoteById(id);
+            var quote = await _quoteService.GetQuoteById(id);
 
-            if (employee is null) return NotFound();
+            if (quote is null) return NotFound();
 
             await _quoteService.UpdateQuoteStatus(id, dto);
 
