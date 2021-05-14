@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceQuotes.Api.Helpers;
-using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.Quote;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain.Entities.Enums;
@@ -19,27 +19,11 @@ namespace ServiceQuotes.Api.Controllers
             _quoteService = quoteService;
         }
 
-
-        //TODO: Finish
-        [Authorize(Role.Manager)]
+        [Authorize(Role.Manager, Role.Customer)]
         [HttpGet]
-        public async Task<ActionResult<List<GetEmployeeResponse>>> GetEmployees([FromQuery] GetEmployeesFilter filter)
+        public async Task<ActionResult<List<GetQuoteResponse>>> GetQuotes([FromQuery] GetQuotesFilter filter)
         {
-            return Ok(await _employeeService.GetAllEmployees(filter));
-        }
-
-        [Authorize(Role.Manager)]
-        [HttpGet("{id:guid}")]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(typeof(GetEmployeeResponse), 200)]
-        public async Task<ActionResult<GetEmployeeWithSpecializationsResponse>> GetEmployeeById(Guid id)
-        {
-            var employee = await _employeeService.GetEmployeeById(id);
-
-            if (employee is null) return NotFound();
-
-            return Ok(employee);
+            return Ok(await _quoteService.GetAllQuotes(filter));
         }
 
         [Authorize(Role.Manager)]
@@ -47,36 +31,14 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]
-        public async Task<ActionResult<GetEmployeeResponse>> UpdateEmployee(Guid id, [FromBody] UpdateEmployeeRequest dto)
+        public async Task<ActionResult<GetQuoteResponse>> UpdateQuoteStatus(Guid id, [FromBody] UpdateQuoteStatusRequest dto)
         {
-            var employee = await _employeeService.GetEmployeeById(id);
+            var employee = await _quoteService.GetQuoteById(id);
 
             if (employee is null) return NotFound();
 
-            await _employeeService.UpdateEmployee(id, dto);
+            await _quoteService.UpdateQuoteStatus(id, dto);
 
-            return NoContent();
-        }
-
-        [Authorize(Role.Manager)]
-        [HttpPost("{employeeId:guid}/specializations")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult<GetEmployeeResponse>> AssignSpecialization(Guid employeeId, [FromBody] AssignSpecializationRequest dto)
-        {
-            await _employeeService.AddSpecialization(employeeId, dto.SpecializationId);
-            return NoContent();
-        }
-
-        [Authorize(Role.Manager)]
-        [HttpDelete("{employeeId:guid}/specializations/{specializationId:guid}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(401)]
-        public ActionResult<GetEmployeeResponse> RemoveSpecialization(Guid employeeId, Guid specializationId)
-        {
-            _employeeService.RemoveSpecialization(employeeId, specializationId);
             return NoContent();
         }
     }

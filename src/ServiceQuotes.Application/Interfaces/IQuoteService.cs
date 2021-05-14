@@ -12,6 +12,6 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<GetQuoteResponse> GetQuoteById(Guid id);
 
-        Task<GetQuoteResponse> UpdateQuote(Guid id, UpdateQuoteStatusRequest dto);
+        Task<GetQuoteResponse> UpdateQuoteStatus(Guid id, UpdateQuoteStatusRequest dto);
     }
 }
