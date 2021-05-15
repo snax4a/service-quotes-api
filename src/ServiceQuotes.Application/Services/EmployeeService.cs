@@ -64,7 +64,7 @@ namespace ServiceQuotes.Application.Services
         public async Task<GetEmployeeResponse> CreateEmployee(CreateEmployeeRequest dto)
         {
             // validate
-            if (await _unitOfWork.Accounts.Get(dto.AccountId) is not null)
+            if (await _unitOfWork.Accounts.Get(dto.AccountId) is null)
                 throw new KeyNotFoundException("Account does not exist.");
 
             // map dto to new employee object

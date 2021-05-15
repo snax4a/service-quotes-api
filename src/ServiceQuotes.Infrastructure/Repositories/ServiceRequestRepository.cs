@@ -5,6 +5,7 @@ using ServiceQuotes.Infrastructure.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Infrastructure.Repositories
@@ -20,19 +21,27 @@ namespace ServiceQuotes.Infrastructure.Repositories
                             .ThenInclude(ca => ca.Address)
                         .Include(sr => sr.CustomerAddress)
                             .ThenInclude(ca => ca.Customer)
+                        .Include(sr => sr.ServiceRequestEmployees)
+                            .ThenInclude(sre => sre.Employee)
+                                .ThenInclude(e => e.EmployeeSpecializations)
+                                    .ThenInclude(es => es.Specialization)
+                        .Include(sr => sr.ServiceRequestEmployees)
+                            .ThenInclude(sre => sre.Employee)
+                                .ThenInclude(e => e.Account)
                         .SingleOrDefaultAsync(sr => sr.Id == id);
         }
 
-        public async Task<IEnumerable<ServiceRequest>> GetAllWithAddressByCustomertId(Guid customerId)
+        public async Task<IEnumerable<ServiceRequest>> FindWithAddress(Expression<Func<ServiceRequest, bool>> predicate)
         {
             return await _entities
                         .Include(sr => sr.CustomerAddress)
                             .ThenInclude(ca => ca.Address)
-                        .Where(sr => sr.CustomerId == customerId)
+                        .Where(predicate)
                         .ToListAsync();
         }
 
-        public async Task<IEnumerable<ServiceRequest>> GetAllWithCustomerAndAddressByEmployeeId(Guid employeeId)
+        public async Task<IEnumerable<ServiceRequest>> FindWithCustomerAndAddressAndEmployees(
+            Expression<Func<ServiceRequest, bool>> predicate)
         {
             return await _entities
                         .Include(sr => sr.CustomerAddress)
@@ -41,7 +50,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                             .ThenInclude(ca => ca.Customer)
                                 .ThenInclude(c => c.Account)
                         .Include(sr => sr.ServiceRequestEmployees)
-                        .Where(sr => sr.ServiceRequestEmployees.Any(sre => sre.EmployeeId == employeeId))
+                        .Where(predicate)
                         .Select(sr => new ServiceRequest
                         {
                             Id = sr.Id,
