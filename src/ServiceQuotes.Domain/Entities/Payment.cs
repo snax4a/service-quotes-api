@@ -1,25 +1,22 @@
 using ServiceQuotes.Domain.Entities.Abstractions;
+using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 
 namespace ServiceQuotes.Domain.Entities
 {
-    public class Employee : Entity
+    public class Payment : Entity
     {
-        public Employee()
-        {
-            EmployeeSpecializations = new HashSet<EmployeeSpecialization>();
-            ServiceRequestEmployees = new HashSet<ServiceRequestEmployee>();
-            ServiceRequestJobValuations = new HashSet<ServiceRequestJobValuation>();
-        }
+        public Guid PaymentId { get; set; }
+        public string Provider { get; set; }
+        public string TransactionId { get; set; }
+        public decimal Amount { get; set; }
+        public Status Status { get; set; }
+        public virtual Quote Quote { get; set; }
+        public virtual Customer Customer { get; set; }
+        public virtual DateTime Date { get; set; }
 
-        public Guid AccountId { get; set; }
-        public virtual Account Account { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        public virtual ICollection<EmployeeSpecialization> EmployeeSpecializations { get; set; }
-        public virtual ICollection<ServiceRequestEmployee> ServiceRequestEmployees { get; set; }
-        public virtual ICollection<ServiceRequestJobValuation> ServiceRequestJobValuations { get; set; }
+        public virtual ICollection<Quote> Quotes { get; set; }
+        public virtual ICollection<Customer> Customers { get; set; }
     }
 }
