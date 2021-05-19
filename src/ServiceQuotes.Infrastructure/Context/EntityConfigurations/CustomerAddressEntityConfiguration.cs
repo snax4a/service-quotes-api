@@ -9,6 +9,8 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
         public void Configure(EntityTypeBuilder<CustomerAddress> builder)
         {
             builder.HasKey(ca => new { ca.CustomerId, ca.AddressId });
+
+            builder.Property(ca => ca.Name).HasMaxLength(50).IsRequired();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ServiceQuotes.Infrastructure.Context;
@@ -9,9 +10,10 @@ using ServiceQuotes.Infrastructure.Context;
 namespace ServiceQuotes.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210512173146_AddedMaterialEntity")]
+    partial class AddedMaterialEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,29 +181,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.ToTable("EmployeeSpecializations");
                 });
 
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.JobValuation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("HourlyRate")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("numeric(7,2)");
-
-                    b.Property<TimeSpan>("LaborHours")
-                        .HasColumnType("time");
-
-                    b.Property<string>("WorkType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("JobValuations");
-                });
-
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Material", b =>
                 {
                     b.Property<Guid>("Id")
@@ -209,9 +188,7 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
@@ -220,35 +197,13 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("numeric(7,2)");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ServiceRequestId");
 
-                    b.ToTable("Materials");
-                });
-
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Quote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ReferenceNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Total")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("numeric(7,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Quotes");
+                    b.ToTable("Material");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequest", b =>
@@ -304,29 +259,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("ServiceRequestEmployee");
-                });
-
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequestJobValuation", b =>
-                {
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("JobValuationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ServiceRequestId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("EmployeeId", "JobValuationId", "ServiceRequestId");
-
-                    b.HasIndex("JobValuationId");
-
-                    b.HasIndex("ServiceRequestId");
-
-                    b.ToTable("ServiceRequestJobValuations");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Specialization", b =>
@@ -496,33 +428,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.Navigation("ServiceRequest");
                 });
 
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequestJobValuation", b =>
-                {
-                    b.HasOne("ServiceQuotes.Domain.Entities.Employee", "Employee")
-                        .WithMany("ServiceRequestJobValuations")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ServiceQuotes.Domain.Entities.JobValuation", "JobValuation")
-                        .WithMany("ServiceRequestJobValuations")
-                        .HasForeignKey("JobValuationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ServiceQuotes.Domain.Entities.ServiceRequest", "ServiceRequest")
-                        .WithMany("ServiceRequestJobValuations")
-                        .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("JobValuation");
-
-                    b.Navigation("ServiceRequest");
-                });
-
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Address", b =>
                 {
                     b.Navigation("CustomerAddresses");
@@ -543,13 +448,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.Navigation("EmployeeSpecializations");
 
                     b.Navigation("ServiceRequestEmployees");
-
-                    b.Navigation("ServiceRequestJobValuations");
-                });
-
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.JobValuation", b =>
-                {
-                    b.Navigation("ServiceRequestJobValuations");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequest", b =>
@@ -557,8 +455,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.Navigation("Materials");
 
                     b.Navigation("ServiceRequestEmployees");
-
-                    b.Navigation("ServiceRequestJobValuations");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Specialization", b =>

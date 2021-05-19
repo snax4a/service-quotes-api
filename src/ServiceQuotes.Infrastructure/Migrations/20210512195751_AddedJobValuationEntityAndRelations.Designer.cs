@@ -10,8 +10,8 @@ using ServiceQuotes.Infrastructure.Context;
 namespace ServiceQuotes.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210507172015_AddedQuote")]
-    partial class AddedQuote
+    [Migration("20210512195751_AddedJobValuationEntityAndRelations")]
+    partial class AddedJobValuationEntityAndRelations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -181,25 +181,133 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.ToTable("EmployeeSpecializations");
                 });
 
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Quote", b =>
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.JobValuation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("ReferenceNumber")
+                    b.Property<decimal>("HourlyRate")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)");
+
+                    b.Property<TimeSpan>("LaborHours")
+                        .HasColumnType("time");
+
+                    b.Property<string>("WorkType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobValuations");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Material", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ServiceRequestId")
+                        .HasColumnType("uuid");
 
-                    b.Property<decimal>("Total")
+                    b.Property<decimal>("UnitPrice")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quotes");
+                    b.HasIndex("ServiceRequestId");
+
+                    b.ToTable("Materials");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletionDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PlannedExecutionDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId", "AddressId");
+
+                    b.ToTable("ServiceRequests");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequestEmployee", b =>
+                {
+                    b.Property<Guid>("ServiceRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ServiceRequestId", "EmployeeId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("ServiceRequestEmployee");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequestJobValuation", b =>
+                {
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("JobValuationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ServiceRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("EmployeeId", "JobValuationId", "ServiceRequestId");
+
+                    b.HasIndex("JobValuationId");
+
+                    b.HasIndex("ServiceRequestId");
+
+                    b.ToTable("ServiceRequestJobValuations");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Specialization", b =>
@@ -328,6 +436,74 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.Navigation("Specialization");
                 });
 
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Material", b =>
+                {
+                    b.HasOne("ServiceQuotes.Domain.Entities.ServiceRequest", "ServiceRequest")
+                        .WithMany("Materials")
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceRequest");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequest", b =>
+                {
+                    b.HasOne("ServiceQuotes.Domain.Entities.CustomerAddress", "CustomerAddress")
+                        .WithMany("ServiceRequests")
+                        .HasForeignKey("CustomerId", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomerAddress");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequestEmployee", b =>
+                {
+                    b.HasOne("ServiceQuotes.Domain.Entities.Employee", "Employee")
+                        .WithMany("ServiceRequestEmployees")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServiceQuotes.Domain.Entities.ServiceRequest", "ServiceRequest")
+                        .WithMany("ServiceRequestEmployees")
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ServiceRequest");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequestJobValuation", b =>
+                {
+                    b.HasOne("ServiceQuotes.Domain.Entities.Employee", "Employee")
+                        .WithMany("ServiceRequestJobValuations")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServiceQuotes.Domain.Entities.JobValuation", "JobValuation")
+                        .WithMany("ServiceRequestJobValuations")
+                        .HasForeignKey("JobValuationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServiceQuotes.Domain.Entities.ServiceRequest", "ServiceRequest")
+                        .WithMany("ServiceRequestJobValuations")
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("JobValuation");
+
+                    b.Navigation("ServiceRequest");
+                });
+
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Address", b =>
                 {
                     b.Navigation("CustomerAddresses");
@@ -338,9 +514,32 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.Navigation("CustomerAddresses");
                 });
 
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.CustomerAddress", b =>
+                {
+                    b.Navigation("ServiceRequests");
+                });
+
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Employee", b =>
                 {
                     b.Navigation("EmployeeSpecializations");
+
+                    b.Navigation("ServiceRequestEmployees");
+
+                    b.Navigation("ServiceRequestJobValuations");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.JobValuation", b =>
+                {
+                    b.Navigation("ServiceRequestJobValuations");
+                });
+
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequest", b =>
+                {
+                    b.Navigation("Materials");
+
+                    b.Navigation("ServiceRequestEmployees");
+
+                    b.Navigation("ServiceRequestJobValuations");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Specialization", b =>
