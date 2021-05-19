@@ -14,6 +14,7 @@ namespace ServiceQuotes.Infrastructure.Context
         public DbSet<CustomerAddress> CustomerAddresses { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Specialization> Specializations { get; set; }
+        public DbSet<Quote> Quotes { get; set; }
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<JobValuation> JobValuations { get; set; }
@@ -33,6 +34,7 @@ namespace ServiceQuotes.Infrastructure.Context
             modelBuilder.ApplyConfiguration<Employee>(new EmployeeEntityConfiguration());
             modelBuilder.ApplyConfiguration<Specialization>(new SpecializationEntityConfiguration());
             modelBuilder.ApplyConfiguration<EmployeeSpecialization>(new EmployeeSpecializationEntityConfiguration());
+            modelBuilder.ApplyConfiguration<Quote>(new QuoteEntityConfiguration());
             modelBuilder.ApplyConfiguration<ServiceRequest>(new ServiceRequestEntityConfiguration());
             modelBuilder.ApplyConfiguration<ServiceRequestEmployee>(new ServiceRequestEmployeeEntityConfiguration());
             modelBuilder.ApplyConfiguration<Material>(new MaterialEntityConfiguration());

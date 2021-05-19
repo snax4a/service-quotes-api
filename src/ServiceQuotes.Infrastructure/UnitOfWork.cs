@@ -16,6 +16,7 @@ namespace ServiceQuotes.Infrastructure
         private readonly Lazy<ICustomerAddressRepository> _customerAddressRepository;
         private readonly Lazy<IEmployeeRepository> _employeeRepository;
         private readonly Lazy<ISpecializationRepository> _specializationRepository;
+        private readonly Lazy<IQuoteRepository> _quoteRepository;
         private readonly Lazy<IServiceRequestRepository> _serviceRequestRepository;
         private readonly Lazy<IMaterialRepository> _materialRepository;
 
@@ -28,6 +29,7 @@ namespace ServiceQuotes.Infrastructure
             _customerAddressRepository = new Lazy<ICustomerAddressRepository>(() => new CustomerAddressRepository(context));
             _employeeRepository = new Lazy<IEmployeeRepository>(() => new EmployeeRepository(context));
             _specializationRepository = new Lazy<ISpecializationRepository>(() => new SpecializationRepository(context));
+            _quoteRepository = new Lazy<IQuoteRepository>(() => new QuoteRepository(context));
             _serviceRequestRepository = new Lazy<IServiceRequestRepository>(() => new ServiceRequestRepository(context));
             _materialRepository = new Lazy<IMaterialRepository>(() => new MaterialRepository(context));
         }
@@ -61,6 +63,12 @@ namespace ServiceQuotes.Infrastructure
         {
             get { return _specializationRepository.Value; }
         }
+
+        public IQuoteRepository Quotes
+        {
+            get { return _quoteRepository.Value; }
+        }
+
         public IServiceRequestRepository ServiceRequests
         {
             get { return _serviceRequestRepository.Value; }

@@ -32,8 +32,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{346415FF-9233-459C-AE00-06ACFE985BC1}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		ServiceQuotes.ruleset = ServiceQuotes.ruleset
 		README.md = README.md
+		ServiceQuotes.ruleset = ServiceQuotes.ruleset
 	EndProjectSection
 EndProject
 Global
