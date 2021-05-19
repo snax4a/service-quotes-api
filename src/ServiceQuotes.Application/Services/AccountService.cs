@@ -8,6 +8,7 @@ using ServiceQuotes.Application.Helpers;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Entities;
+using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,49 @@ namespace ServiceQuotes.Application.Services
 
         public async Task<GetAccountResponse> GetAccountById(Guid id)
         {
-            return _mapper.Map<GetAccountResponse>(await _unitOfWork.Accounts.Get(id));
+            var account = await _unitOfWork.Accounts.Get(id);
+
+            if (account is null)
+                throw new KeyNotFoundException("Accound does not exist.");
+
+            if (account.Role == Role.Customer)
+            {
+                var customer = await _unitOfWork.Customers.GetByAccountId(account.Id);
+
+                if (customer is null)
+                    throw new KeyNotFoundException("Could not find customer record related to this account.");
+
+                return new GetAccountWithCustomerResponse()
+                {
+                    Id = account.Id,
+                    Email = account.Email,
+                    Role = account.Role.ToString(),
+                    Created = account.Created,
+                    Updated = account.Updated,
+                    CustomerId = customer.Id,
+                    CompanyName = customer.CompanyName,
+                    VatNumber = customer.VatNumber
+                };
+            }
+            else
+            {
+                var employee = await _unitOfWork.Employees.GetByAccountId(account.Id);
+
+                if (employee is null)
+                    throw new KeyNotFoundException("Could not find employee record related to this account.");
+
+                return new GetAccountWithEmployeeResponse()
+                {
+                    Id = account.Id,
+                    Email = account.Email,
+                    Role = account.Role.ToString(),
+                    Created = account.Created,
+                    Updated = account.Updated,
+                    EmployeeId = employee.Id,
+                    FirstName = employee.FirstName,
+                    LastName = employee.LastName
+                };
+            }
         }
 
         public async Task<GetAccountResponse> CreateAccount(CreateAccountRequest dto)
@@ -66,9 +109,43 @@ namespace ServiceQuotes.Application.Services
             newAccount.Created = DateTime.Now;
 
             _unitOfWork.Accounts.Add(newAccount);
+
+            // For customer role we create customer entity
+            // For employee and manager role we create employee entity
+            if (dto.Role == Role.Customer)
+            {
+                if (string.IsNullOrEmpty(dto.CompanyName))
+                    throw new AppException("Company name is required");
+
+                if (string.IsNullOrEmpty(dto.VatNumber))
+                    throw new AppException("Vat number is required");
+
+                _unitOfWork.Customers.Add(new Customer()
+                {
+                    AccountId = newAccount.Id,
+                    CompanyName = dto.CompanyName,
+                    VatNumber = dto.VatNumber
+                });
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(dto.FirstName))
+                    throw new AppException("First name is required");
+
+                if (string.IsNullOrEmpty(dto.LastName))
+                    throw new AppException("Last name is required");
+
+                _unitOfWork.Employees.Add(new Employee()
+                {
+                    AccountId = newAccount.Id,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName
+                });
+            }
+
             _unitOfWork.Commit();
 
-            return _mapper.Map<GetAccountResponse>(newAccount);
+            return await GetAccountById(newAccount.Id);
         }
 
         public async Task<GetAccountResponse> UpdateAccount(Guid id, UpdateAccountRequest dto)
