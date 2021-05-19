@@ -178,7 +178,8 @@ namespace ServiceQuotes.Application.Services
             var serviceRequest = await _unitOfWork.ServiceRequests.Get(id);
 
             // validate
-            if (serviceRequest is null) throw new KeyNotFoundException();
+            if (serviceRequest is null)
+                throw new KeyNotFoundException("Service does not exist.");
 
             // update
             if (dto.CustomerId is not null && serviceRequest.CustomerId != dto.CustomerId)
@@ -201,6 +202,48 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetServiceResponse>(serviceRequest);
         }
 
+        public async Task<GetServiceResponse> UpdateServiceStatus(Guid id, UpdateServiceStatusRequest dto)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(id);
+
+            // validate
+            if (serviceRequest is null)
+                throw new KeyNotFoundException("Service does not exist.");
+
+            switch (dto.Status)
+            {
+                case Status.Assigned:
+                    if (serviceRequest.Status != Status.New)
+                        throw new AppException("This status is not allowed for this service state.");
+                    break;
+
+                case Status.InProgress:
+                    if (serviceRequest.Status != Status.Assigned)
+                        throw new AppException("This status is not allowed for this service state.");
+                    break;
+
+                case Status.Completed:
+                    if (serviceRequest.Status != Status.InProgress)
+                        throw new AppException("This status is not allowed for this service state.");
+                    break;
+
+                case Status.Cancelled:
+                    Status[] possibleStatuses = { Status.New, Status.Assigned };
+                    if (!possibleStatuses.Contains(serviceRequest.Status))
+                        throw new AppException("This status is not allowed for this service state.");
+                    break;
+
+                default:
+                    throw new AppException("Incorrect status");
+            }
+
+            serviceRequest.Status = dto.Status;
+
+            _unitOfWork.Commit();
+
+            return _mapper.Map<GetServiceResponse>(serviceRequest);
+        }
+
         public async Task<GetMaterialResponse> AddMaterial(Guid serviceRequestId, CreateMaterialRequest dto)
         {
             var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
@@ -209,7 +252,11 @@ namespace ServiceQuotes.Application.Services
             if (serviceRequest is null)
                 throw new KeyNotFoundException("Service request does not exist.");
 
+            if (serviceRequest.Status != Status.InProgress)
+                throw new AppException("This service is not in progress.");
+
             var newMaterial = _mapper.Map<Material>(dto);
+            newMaterial.ServiceRequestId = serviceRequestId;
 
             _unitOfWork.Materials.Add(newMaterial);
             _unitOfWork.Commit();
@@ -217,7 +264,7 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetMaterialResponse>(newMaterial);
         }
 
-        public async void RemoveMaterial(Guid materialId)
+        public async Task RemoveMaterial(Guid materialId)
         {
             var material = await _unitOfWork.Materials.Get(materialId);
 

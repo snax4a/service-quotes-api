@@ -20,8 +20,10 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<GetServiceResponse> UpdateServiceRequest(Guid id, UpdateServiceRequest dto);
 
+        Task<GetServiceResponse> UpdateServiceStatus(Guid id, UpdateServiceStatusRequest dto);
+
         Task<GetMaterialResponse> AddMaterial(Guid serviceRequestId, CreateMaterialRequest dto);
 
-        void RemoveMaterial(Guid materialId);
+        Task RemoveMaterial(Guid materialId);
     }
 }

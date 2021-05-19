@@ -5,9 +5,6 @@ namespace ServiceQuotes.Application.DTOs.Material
 {
     public class CreateMaterialRequest
     {
-        [Required(ErrorMessage = "Service request id is required")]
-        public Guid ServiceRequestId { get; set; }
-
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
