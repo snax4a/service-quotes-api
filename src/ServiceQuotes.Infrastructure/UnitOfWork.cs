@@ -16,6 +16,7 @@ namespace ServiceQuotes.Infrastructure
         private readonly Lazy<ICustomerAddressRepository> _customerAddressRepository;
         private readonly Lazy<IEmployeeRepository> _employeeRepository;
         private readonly Lazy<ISpecializationRepository> _specializationRepository;
+        private readonly Lazy<IQuoteRepository> _quoteRepository;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -26,6 +27,7 @@ namespace ServiceQuotes.Infrastructure
             _customerAddressRepository = new Lazy<ICustomerAddressRepository>(() => new CustomerAddressRepository(context));
             _employeeRepository = new Lazy<IEmployeeRepository>(() => new EmployeeRepository(context));
             _specializationRepository = new Lazy<ISpecializationRepository>(() => new SpecializationRepository(context));
+            _quoteRepository = new Lazy<IQuoteRepository>(() => new QuoteRepository(context));
         }
 
         public IAccountRepository Accounts
@@ -56,6 +58,11 @@ namespace ServiceQuotes.Infrastructure
         public ISpecializationRepository Specializations
         {
             get { return _specializationRepository.Value; }
+        }
+        
+        public IQuoteRepository Quotes
+        {
+            get { return _quoteRepository.Value; }
         }
 
         public void Commit()
