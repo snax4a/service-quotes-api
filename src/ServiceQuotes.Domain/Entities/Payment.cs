@@ -12,11 +12,11 @@ namespace ServiceQuotes.Domain.Entities
         public string TransactionId { get; set; }
         public decimal Amount { get; set; }
         public Status Status { get; set; }
-        public virtual Quote Quote { get; set; }
-        public virtual Customer Customer { get; set; }
+        public virtual Quote QuoteId { get; set; }
+        public virtual Customer CustomerId { get; set; }
         public virtual DateTime Date { get; set; }
 
-        public virtual ICollection<Quote> Quotes { get; set; }
-        public virtual ICollection<Customer> Customers { get; set; }
+        public virtual Quote Quotes { get; set; }
+        public virtual Customer Customers { get; set; }
     }
 }
