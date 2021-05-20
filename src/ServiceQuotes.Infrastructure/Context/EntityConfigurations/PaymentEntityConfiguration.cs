@@ -20,13 +20,13 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
 
             builder
                 .HasOne(payment => payment.Quote)
-                .WithMany(quote => quote.Payment)
+                .WithMany(quote => quote.Payments)
                 .HasForeignKey(payment => payment.QuoteId);
             
             builder
                 .HasOne(payment => payment.Customer)
-                .WithMany(customer => customer.Payment)
-                .HasForeignKey(payment => payment.Customer);
+                .WithMany(customer => customer.Payments)
+                .HasForeignKey(payment => payment.CustomerId);
         }
     }
 }

@@ -27,5 +27,6 @@ namespace ServiceQuotes.Domain.Entities
         public string VatNumber { get; set; }
 
         public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

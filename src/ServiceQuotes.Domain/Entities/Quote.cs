@@ -7,10 +7,15 @@ namespace ServiceQuotes.Domain.Entities
 {
     public class Quote : Entity
     {
+        public Quote()
+        {
+            Payments = new HashSet<Payment>();
+        }
+
         public int ReferenceNumber { get; set; }
         public decimal Total { get; set; }
         public Status Status { get; set; }
 
-        public virtual ICollection<Payment> Payment { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }
