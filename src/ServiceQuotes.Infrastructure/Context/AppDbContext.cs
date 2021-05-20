@@ -19,6 +19,7 @@ namespace ServiceQuotes.Infrastructure.Context
         public DbSet<JobValuation> JobValuations { get; set; }
         public DbSet<ServiceRequestJobValuation> ServiceRequestJobValuations { get; set; }
         public DbSet<Quote> Quotes { get; set; }
+        public DbSet<Payment> Payment { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,6 +41,7 @@ namespace ServiceQuotes.Infrastructure.Context
             modelBuilder.ApplyConfiguration<JobValuation>(new JobValuationEntityConfiguration());
             modelBuilder.ApplyConfiguration<ServiceRequestJobValuation>(new ServiceRequestJobValuationEntityConfiguration());
             modelBuilder.ApplyConfiguration<Quote>(new QuoteEntityConfiguration());
+            modelBuilder.ApplyConfiguration<Payment>(new PaymentEntityConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
