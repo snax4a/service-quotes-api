@@ -10,6 +10,7 @@ namespace ServiceQuotes.Domain.Entities
         public Quote()
         {
             Payments = new HashSet<Payment>();
+            ServiceRequests = new HashSet<ServiceRequest>();
         }
 
         public int ReferenceNumber { get; set; }
@@ -17,5 +18,6 @@ namespace ServiceQuotes.Domain.Entities
         public Status Status { get; set; }
 
         public virtual ICollection<Payment> Payments { get; set; }
+        public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
     }
 }
