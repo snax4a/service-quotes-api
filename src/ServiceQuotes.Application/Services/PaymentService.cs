@@ -49,12 +49,17 @@ namespace ServiceQuotes.Application.Services
 
         public async Task<GetPaymentResponse> CreatePayment(CreatePaymentRequest dto)
         {
-            // validate
-            if (await _unitOfWork.Payments.Get(dto.TransactionId) is not null)
-                throw new KeyNotFoundException($"Payment with '{dto.TransactionId}' already exists.");
+            var customer = await _unitOfWork.Customers.Get(new Guid(dto.CustomerId));
+            var quote = await _unitOfWork.Quotes.Get(new Guid(dto.QuoteId));
 
-            // map dto to new payment object
+            // validate
+            if (customer is null) throw new KeyNotFoundException("Customer does not exist.");
+            if (quote is null) throw new KeyNotFoundException("Quote does not exist.");
+
+            // map dto to new employee object
             var newPayment = _mapper.Map<Payment>(dto);
+            newPayment.Status = Status.New;
+            newPayment.Date = DateTime.UtcNow;
 
             _unitOfWork.Payments.Add(newPayment);
             _unitOfWork.Commit();

@@ -27,7 +27,7 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Manager)]
-        [HttpPut("{id:guid}")]
+        [HttpPut("{id:guid}/status")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]

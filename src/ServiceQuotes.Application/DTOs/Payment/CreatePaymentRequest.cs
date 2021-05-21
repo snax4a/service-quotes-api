@@ -1,4 +1,5 @@
-﻿using ServiceQuotes.Domain.Entities.Enums;
+﻿using ServiceQuotes.Application.Helpers;
+using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,11 +19,11 @@ namespace ServiceQuotes.Application.DTOs.Payment
         [Required(ErrorMessage = "Status is required")]
         public Status Status { get; set; }
 
-        [Required(ErrorMessage = "Quote ID is required")]
-        public Guid QuoteId { get; set; }
+        [ValidateGuid]
+        public string QuoteId { get; set; }
 
-        [Required(ErrorMessage = "Customer ID is required")]
-        public Guid CutomerId { get; set; }
+        [ValidateGuid]
+        public string CustomerId { get; set; }
 
         [Required(ErrorMessage = "Date is required")]
         public DateTime Date { get; set; }

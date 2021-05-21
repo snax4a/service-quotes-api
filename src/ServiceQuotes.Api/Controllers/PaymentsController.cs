@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace ServiceQuotes.Api.Controllers
 {
-    public class PaymentController : BaseController<QuotesController>
+    public class PaymentsController : BaseController<PaymentsController>
     {
         private readonly IPaymentService _paymentService;
 
-        public PaymentController(IPaymentService paymentService)
+        public PaymentsController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
         }
@@ -41,7 +41,17 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Manager)]
-        [HttpPut("{id:guid}")]
+        [HttpPost]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(201)]
+        public async Task<ActionResult<GetPaymentResponse>> CreatePaymentRequest(Guid id, [FromBody] CreatePaymentRequest dto)
+        {
+            var newPayment = await _paymentService.CreatePayment(dto);
+            return CreatedAtAction("GetPaymentById", new { id = newPayment.Id }, newPayment);
+        }
+
+        [Authorize(Role.Manager)]
+        [HttpPut("{id:guid}/status")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]
@@ -57,7 +67,7 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Manager, Role.Customer)]
-        [HttpGet("{id:guid}")]
+        [HttpGet("customer/{id:guid}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
@@ -71,7 +81,7 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Manager, Role.Customer)]
-        [HttpGet("{id:guid}")]
+        [HttpGet("quote/{id:guid}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
