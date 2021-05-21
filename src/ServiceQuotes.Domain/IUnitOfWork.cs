@@ -13,6 +13,7 @@ namespace ServiceQuotes.Domain
         IEmployeeRepository Employees { get; }
         ISpecializationRepository Specializations { get; }
         IQuoteRepository Quotes { get; }
+        IPaymentRepository Payments { get; }
 
         void Commit();
         Task CommitAsync();

@@ -4,6 +4,8 @@ using ServiceQuotes.Application.DTOs.Customer;
 using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.DTOs.Employee;
 using ServiceQuotes.Application.DTOs.Specialization;
+using ServiceQuotes.Application.DTOs.Quote;
+using ServiceQuotes.Application.DTOs.Payment;
 using ServiceQuotes.Domain.Entities;
 
 namespace ServiceQuotes.Application.MappingProfiles
@@ -46,6 +48,15 @@ namespace ServiceQuotes.Application.MappingProfiles
             CreateMap<Specialization, GetSpecializationResponse>().ReverseMap();
             CreateMap<CreateSpecializationRequest, Specialization>();
             CreateMap<UpdateSpecializationRequest, Specialization>();
+
+            // Quote Map
+            CreateMap<Quote, GetQuoteResponse>().ReverseMap();
+            CreateMap<UpdateQuoteStatusRequest, Quote>();
+
+            // Payment Map
+            CreateMap<Payment, GetPaymentResponse>().ReverseMap();
+            CreateMap<CreatePaymentRequest, Quote>();
+            CreateMap<UpdatePaymentStatusRequest, Quote>();
         }
     }
 }
