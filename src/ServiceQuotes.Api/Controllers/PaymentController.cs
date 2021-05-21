@@ -61,7 +61,7 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<GetPaymentResponse>> GetEmployeeByCustomerId(Guid id)
+        public async Task<ActionResult<List<GetPaymentResponse>>> GetEmployeeByCustomerId(Guid id)
         {
             var payment = await _paymentService.GetPaymentsByCustomerId(id);
 
@@ -75,7 +75,7 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<GetPaymentResponse>> GetEmployeeByQuoteId(Guid id)
+        public async Task<ActionResult<List<GetPaymentResponse>>> GetEmployeeByQuoteId(Guid id)
         {
             var payment = await _paymentService.GetPaymentsByQuoteId(id);
 

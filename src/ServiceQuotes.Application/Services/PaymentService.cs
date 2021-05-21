@@ -76,14 +76,14 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetPaymentResponse>(payment);
         }
 
-        public async Task<GetPaymentResponse> GetPaymentsByCustomerId(Guid id)
+        public async Task<List<GetPaymentResponse>> GetPaymentsByCustomerId(Guid id)
         {
-            return _mapper.Map<GetPaymentResponse>(await _unitOfWork.Payments.Find(p => p.CustomerId.Equals(id)));
+            return _mapper.Map<List<GetPaymentResponse>>(await _unitOfWork.Payments.Find(p => p.CustomerId.Equals(id)));
         }
 
-        public async Task<GetPaymentResponse> GetPaymentsByQuoteId(Guid id)
+        public async Task<List<GetPaymentResponse>> GetPaymentsByQuoteId(Guid id)
         {
-            return _mapper.Map<GetPaymentResponse>(await _unitOfWork.Payments.Find(p => p.QuoteId.Equals(id)));
+            return _mapper.Map<List<GetPaymentResponse>>(await _unitOfWork.Payments.Find(p => p.QuoteId.Equals(id)));
         }
 
         public void Dispose()
