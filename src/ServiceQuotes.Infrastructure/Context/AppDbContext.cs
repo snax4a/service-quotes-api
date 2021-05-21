@@ -14,7 +14,6 @@ namespace ServiceQuotes.Infrastructure.Context
         public DbSet<CustomerAddress> CustomerAddresses { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Specialization> Specializations { get; set; }
-<<<<<<<<< Temporary merge branch 1
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<JobValuation> JobValuations { get; set; }
