@@ -13,6 +13,8 @@ namespace ServiceQuotes.Domain
         IEmployeeRepository Employees { get; }
         ISpecializationRepository Specializations { get; }
         IQuoteRepository Quotes { get; }
+        IServiceRequestRepository ServiceRequests { get; }
+        IMaterialRepository Materials { get; }
         IPaymentRepository Payments { get; }
 
         void Commit();

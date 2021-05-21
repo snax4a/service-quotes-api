@@ -3,6 +3,8 @@ using ServiceQuotes.Application.DTOs.Account;
 using ServiceQuotes.Application.DTOs.Customer;
 using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.Material;
+using ServiceQuotes.Application.DTOs.ServiceRequest;
 using ServiceQuotes.Application.DTOs.Specialization;
 using ServiceQuotes.Application.DTOs.Quote;
 using ServiceQuotes.Application.DTOs.Payment;
@@ -38,16 +40,28 @@ namespace ServiceQuotes.Application.MappingProfiles
             CreateMap<CustomerAddress, GetCustomerAddressWithCustomerResponse>();
             ///
 
-            // Employee Map
+            /// Employee Map
             CreateMap<Employee, GetEmployeeResponse>().ReverseMap();
             CreateMap<Employee, GetEmployeeWithSpecializationsResponse>();
             CreateMap<CreateEmployeeRequest, Employee>();
             CreateMap<UpdateEmployeeRequest, Employee>();
 
-            // Specialization Map
+            /// Specialization Map
             CreateMap<Specialization, GetSpecializationResponse>().ReverseMap();
             CreateMap<CreateSpecializationRequest, Specialization>();
             CreateMap<UpdateSpecializationRequest, Specialization>();
+
+            /// ServiceRequest Map
+            CreateMap<ServiceRequest, GetServiceResponse>().ReverseMap();
+            CreateMap<ServiceRequest, GetServiceDetailsResponse>();
+            CreateMap<CreateServiceRequest, ServiceRequest>();
+            CreateMap<UpdateServiceRequest, ServiceRequest>();
+            ///
+
+            /// Material Map
+            CreateMap<Material, GetMaterialResponse>().ReverseMap();
+            CreateMap<CreateMaterialRequest, Material>();
+            ///
 
             // Quote Map
             CreateMap<Quote, GetQuoteResponse>().ReverseMap();

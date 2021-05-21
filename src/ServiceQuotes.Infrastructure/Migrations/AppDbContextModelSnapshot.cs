@@ -230,6 +230,27 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.ToTable("Materials");
                 });
 
+            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Quote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ReferenceNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Quotes");
+                });
+
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
