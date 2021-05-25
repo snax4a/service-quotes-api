@@ -12,6 +12,7 @@ using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Repositories;
 using ServiceQuotes.Infrastructure;
 using ServiceQuotes.Infrastructure.Repositories;
+using System.Linq;
 
 namespace ServiceQuotes.Api
 {
@@ -86,6 +87,15 @@ namespace ServiceQuotes.Api
             app.UseRouting();
             app.UseApiDoc();
 
+            // CORS configuration
+            app.UseCors(policy =>
+                policy
+                  .WithOrigins(Configuration.GetValue<string>("AllowedOrigins").Split(";").ToArray())
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+            );
+
             // custom jwt auth middleware
             app.UseMiddleware<JwtMiddleware>();
 
@@ -94,12 +104,7 @@ namespace ServiceQuotes.Api
                 endpoints.MapControllers();
             });
 
-            //added request logging
-
-
             app.UseHttpsRedirection();
-
-
             app.UseResponseCompression();
         }
     }

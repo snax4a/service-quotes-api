@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace ServiceQuotes.Infrastructure.Migrations
 {
@@ -7,20 +7,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Quotes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReferenceNumber = table.Column<int>(type: "integer", nullable: false),
-                    Total = table.Column<decimal>(type: "numeric(7,2)", precision: 7, scale: 2, nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Quotes", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Payment",
                 columns: table => new
@@ -66,9 +52,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Payment");
-
-            migrationBuilder.DropTable(
-                name: "Quotes");
         }
     }
 }
