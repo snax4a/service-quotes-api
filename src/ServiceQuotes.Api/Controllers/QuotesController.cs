@@ -26,8 +26,22 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(await _quoteService.GetAllQuotes(filter));
         }
 
+        [Authorize]
+        [HttpGet("{id:guid}")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(GetQuoteResponse), 200)]
+        public async Task<ActionResult<GetQuoteResponse>> GetQuoteById(Guid id)
+        {
+            var quote = await _quoteService.GetQuoteById(id);
+
+            if (quote is null) return NotFound();
+
+            return Ok(quote);
+        }
+
         [Authorize(Role.Manager)]
-        [HttpPut("{id:guid}")]
+        [HttpPut("{id:guid}/status")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]

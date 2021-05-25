@@ -47,6 +47,8 @@ namespace ServiceQuotes.Api
             services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>();
             services.AddScoped<IServiceRequestService, ServiceRequestService>();
             services.AddScoped<IMaterialRepository, MaterialRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IPaymentService, PaymentService>();
 
             // configure strongly typed settings object
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));

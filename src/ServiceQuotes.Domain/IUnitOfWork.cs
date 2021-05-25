@@ -15,6 +15,7 @@ namespace ServiceQuotes.Domain
         IQuoteRepository Quotes { get; }
         IServiceRequestRepository ServiceRequests { get; }
         IMaterialRepository Materials { get; }
+        IPaymentRepository Payments { get; }
 
         void Commit();
         Task CommitAsync();

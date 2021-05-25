@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ServiceQuotes.Infrastructure.Context;
@@ -9,9 +10,10 @@ using ServiceQuotes.Infrastructure.Context;
 namespace ServiceQuotes.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210520201633_AddedPayment")]
+    partial class AddedPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,27 +230,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.HasIndex("ServiceRequestId");
 
                     b.ToTable("Materials");
-                });
-
-            modelBuilder.Entity("ServiceQuotes.Domain.Entities.Quote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ReferenceNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Total")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("numeric(7,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Payment", b =>

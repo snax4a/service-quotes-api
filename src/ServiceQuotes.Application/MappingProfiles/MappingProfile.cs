@@ -6,6 +6,8 @@ using ServiceQuotes.Application.DTOs.Employee;
 using ServiceQuotes.Application.DTOs.Material;
 using ServiceQuotes.Application.DTOs.ServiceRequest;
 using ServiceQuotes.Application.DTOs.Specialization;
+using ServiceQuotes.Application.DTOs.Quote;
+using ServiceQuotes.Application.DTOs.Payment;
 using ServiceQuotes.Domain.Entities;
 
 namespace ServiceQuotes.Application.MappingProfiles
@@ -60,6 +62,15 @@ namespace ServiceQuotes.Application.MappingProfiles
             CreateMap<Material, GetMaterialResponse>().ReverseMap();
             CreateMap<CreateMaterialRequest, Material>();
             ///
+
+            // Quote Map
+            CreateMap<Quote, GetQuoteResponse>().ReverseMap();
+            CreateMap<UpdateQuoteStatusRequest, Quote>();
+
+            // Payment Map
+            CreateMap<Payment, GetPaymentResponse>().ReverseMap();
+            CreateMap<CreatePaymentRequest, Quote>();
+            CreateMap<UpdatePaymentStatusRequest, Quote>();
         }
     }
 }
