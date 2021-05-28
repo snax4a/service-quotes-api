@@ -11,6 +11,7 @@ namespace ServiceQuotes.Application.Interfaces
         Task<List<GetQuoteResponse>> GetAllQuotes(GetQuotesFilter filter);
 
         Task<GetQuoteResponse> GetQuoteById(Guid id);
+        Task<List<GetQuoteResponse>> GetTopUnpaidQuotes(GetQuotesFilter filter);
 
         Task<GetQuoteResponse> UpdateQuoteStatus(Guid id, UpdateQuoteStatusRequest dto);
     }

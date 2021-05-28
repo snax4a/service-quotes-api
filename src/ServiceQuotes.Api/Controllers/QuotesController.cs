@@ -4,6 +4,7 @@ using ServiceQuotes.Application.DTOs.Quote;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain.Entities.Enums;
+using ServiceQuotes.Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,10 +14,12 @@ namespace ServiceQuotes.Api.Controllers
     public class QuotesController : BaseController<QuotesController>
     {
         private readonly IQuoteService _quoteService;
+        private readonly ICustomerRepository _customerRepository;
 
-        public QuotesController(IQuoteService quoteService)
+        public QuotesController(IQuoteService quoteService, ICustomerRepository customerRepository)
         {
             _quoteService = quoteService;
+            _customerRepository = customerRepository;
         }
 
         [Authorize(Role.Manager, Role.Customer)]
@@ -24,6 +27,19 @@ namespace ServiceQuotes.Api.Controllers
         public async Task<ActionResult<List<GetQuoteResponse>>> GetQuotes([FromQuery] GetQuotesFilter filter)
         {
             return Ok(await _quoteService.GetAllQuotes(filter));
+        }
+
+        [Authorize(Role.Manager, Role.Customer)]
+        [HttpGet("unpaid")]
+        public async Task<ActionResult<List<GetQuoteResponse>>> GetTopUnpaidQuotes([FromQuery] GetQuotesFilter filter)
+        {
+            if (Account.Role == Role.Customer)
+            {
+                var customer = await _customerRepository.GetByAccountId(Account.Id);
+                filter.CustomerId = customer.Id;
+            }
+
+            return Ok(await _quoteService.GetTopUnpaidQuotes(filter));
         }
 
         [Authorize]

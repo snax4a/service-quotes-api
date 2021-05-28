@@ -41,6 +41,23 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<List<GetQuoteResponse>>(quote);
         }
 
+        public async Task<List<GetQuoteResponse>> GetTopUnpaidQuotes(GetQuotesFilter filter)
+        {
+            IEnumerable<Quote> quotes;
+            int limit = filter.Limit != 0 ? filter.Limit : 3;
+
+            if (filter?.CustomerId is not null && filter?.CustomerId != Guid.Empty)
+            {
+                quotes = await _unitOfWork.Quotes.GetTopQuotesByCustomerIdAndStatus((Guid)filter?.CustomerId, Status.Unpaid, limit);
+            }
+            else
+            {
+                quotes = await _unitOfWork.Quotes.GetTopQuotesByStatus(Status.Unpaid, limit);
+            }
+
+            return _mapper.Map<List<GetQuoteResponse>>(quotes);
+        }
+
         public async Task<GetQuoteResponse> GetQuoteById(Guid id)
         {
             return _mapper.Map<GetQuoteResponse>(await _unitOfWork.Quotes.Get(id));
