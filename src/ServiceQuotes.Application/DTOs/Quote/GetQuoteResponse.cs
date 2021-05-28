@@ -8,6 +8,6 @@ namespace ServiceQuotes.Application.DTOs.Quote
         public Guid Id { get; set; }
         public int ReferenceNumber { get; set; }
         public decimal Total { get; set; }
-        public Status Status { get; set; }
+        public string Status { get; set; }
     }
 }

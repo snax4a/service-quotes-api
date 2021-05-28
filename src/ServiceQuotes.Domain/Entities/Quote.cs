@@ -10,14 +10,14 @@ namespace ServiceQuotes.Domain.Entities
         public Quote()
         {
             Payments = new HashSet<Payment>();
-            ServiceRequests = new HashSet<ServiceRequest>();
         }
 
         public int ReferenceNumber { get; set; }
         public decimal Total { get; set; }
         public Status Status { get; set; }
+        public Guid ServiceRequestId { get; set; }
 
         public virtual ICollection<Payment> Payments { get; set; }
-        public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
+        public virtual ServiceRequest ServiceRequest { get; set; }
     }
 }
