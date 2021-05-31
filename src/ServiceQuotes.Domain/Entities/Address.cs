@@ -10,6 +10,7 @@ namespace ServiceQuotes.Domain.Entities
         public Address()
         {
             CustomerAddresses = new HashSet<CustomerAddress>();
+            ServiceRequests = new HashSet<ServiceRequest>();
         }
 
         [Required]
@@ -31,5 +32,6 @@ namespace ServiceQuotes.Domain.Entities
 
         [JsonIgnore]
         public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; }
+        public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
     }
 }

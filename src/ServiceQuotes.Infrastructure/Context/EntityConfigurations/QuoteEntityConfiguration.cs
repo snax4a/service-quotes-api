@@ -16,6 +16,8 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
 
             builder.Property(quote => quote.Total).HasPrecision(7, 2).IsRequired();
 
+            builder.Property(quote => quote.Created).HasDefaultValueSql("NOW()").IsRequired();
+
             builder.HasOne(quote => quote.ServiceRequest).WithOne().HasForeignKey<Quote>("ServiceRequestId").IsRequired();
         }
     }

@@ -16,6 +16,7 @@ namespace ServiceQuotes.Domain.Entities
         public decimal Total { get; set; }
         public Status Status { get; set; }
         public Guid ServiceRequestId { get; set; }
+        public DateTime Created { get; set; }
 
         public virtual ICollection<Payment> Payments { get; set; }
         public virtual ServiceRequest ServiceRequest { get; set; }

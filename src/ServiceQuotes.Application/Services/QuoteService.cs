@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using LinqKit;
+using ServiceQuotes.Application.DTOs.Customer;
+using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.DTOs.Quote;
-using ServiceQuotes.Application.Exceptions;
+using ServiceQuotes.Application.DTOs.ServiceRequest;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain;
@@ -25,7 +27,7 @@ namespace ServiceQuotes.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<GetQuoteResponse>> GetAllQuotes(GetQuotesFilter filter)
+        public async Task<List<GetQuoteWithServiceDetailsResponse>> GetAllQuotes(GetQuotesFilter filter)
         {
             // prepare filter predicate
             var predicate = PredicateBuilder.New<Quote>(true);
@@ -36,12 +38,66 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.Or(p => p.Status.Equals(filter.SearchString.ToLower()));
             }
 
-            var quote = await _unitOfWork.Quotes.Find(predicate);
+            if (!string.IsNullOrEmpty(filter?.DateRange))
+            {
+                switch (filter.DateRange)
+                {
+                    case "30-days":
+                        predicate = predicate.Or(p => p.Created >= DateTime.UtcNow.AddDays(-30));
+                        break;
+                    case "7-days":
+                        predicate = predicate.Or(p => p.Created >= DateTime.UtcNow.AddDays(-7));
+                        break;
+                    case "today":
+                        predicate = predicate.Or(p => p.Created.Date == DateTime.UtcNow.Date);
+                        break;
+                }
+            }
 
-            return _mapper.Map<List<GetQuoteResponse>>(quote);
+            if (filter.Status is not null)
+            {
+                predicate = predicate.And(p => p.Status.Equals(filter.Status));
+            }
+
+            if (filter?.CustomerId is not null && filter?.CustomerId != Guid.Empty)
+            {
+                predicate = predicate.And(p => p.ServiceRequest.CustomerId == filter.CustomerId);
+            }
+
+            var quotes = await _unitOfWork.Quotes.FindWithServiceDetails(predicate);
+
+            return quotes.Select(q => new GetQuoteWithServiceDetailsResponse()
+            {
+                Id = q.Id,
+                ReferenceNumber = q.ReferenceNumber,
+                Total = q.Total,
+                Status = q.Status.ToString(),
+                Created = q.Created,
+                ServiceRequest = new GetServiceWithCustomerAndAddressResponse()
+                {
+                    Id = q.ServiceRequest.Id,
+                    CustomerId = q.ServiceRequest.CustomerId,
+                    AddressId = q.ServiceRequest.AddressId,
+                    Title = q.ServiceRequest.Title,
+                    Description = q.ServiceRequest.Description,
+                    Status = q.ServiceRequest.Status.ToString(),
+                    PlannedExecutionDate = q.ServiceRequest.PlannedExecutionDate,
+                    CompletionDate = q.ServiceRequest.CompletionDate,
+                    Created = q.ServiceRequest.Created,
+                    Address = _mapper.Map<GetAddressResponse>(q.ServiceRequest.Address),
+                    Customer = new GetCustomerWithImageResponse()
+                    {
+                        Id = q.ServiceRequest.Customer.Id,
+                        AccountId = q.ServiceRequest.Customer.AccountId,
+                        CompanyName = q.ServiceRequest.Customer.CompanyName,
+                        VatNumber = q.ServiceRequest.Customer.VatNumber,
+                        Image = q.ServiceRequest.Customer.Account.Image,
+                    }
+                }
+            }).ToList();
         }
 
-        public async Task<List<GetQuoteResponse>> GetTopUnpaidQuotes(GetQuotesFilter filter)
+        public async Task<List<GetQuoteWithServiceDetailsResponse>> GetTopUnpaidQuotes(GetQuotesFilter filter)
         {
             IEnumerable<Quote> quotes;
             int limit = filter.Limit != 0 ? filter.Limit : 3;
@@ -55,12 +111,13 @@ namespace ServiceQuotes.Application.Services
                 quotes = await _unitOfWork.Quotes.GetTopQuotesByStatus(Status.Unpaid, limit);
             }
 
-            return _mapper.Map<List<GetQuoteResponse>>(quotes);
+            return _mapper.Map<List<GetQuoteWithServiceDetailsResponse>>(quotes);
         }
 
-        public async Task<GetQuoteResponse> GetQuoteById(Guid id)
+        public async Task<GetQuoteWithServiceDetailsResponse> GetQuoteById(Guid id)
         {
-            return _mapper.Map<GetQuoteResponse>(await _unitOfWork.Quotes.Get(id));
+            var quotes = await _unitOfWork.Quotes.GetWithServiceDetails(id);
+            return _mapper.Map<GetQuoteWithServiceDetailsResponse>(quotes);
         }
 
         public async Task<GetQuoteResponse> UpdateQuoteStatus(Guid id, UpdateQuoteStatusRequest dto)

@@ -9,5 +9,6 @@ namespace ServiceQuotes.Application.Filters
         public int? ReferenceNumber { get; set; }
         public Status? Status { get; set; }
         public int Limit { get; set; }
+        public string DateRange { get; set; }
     }
 }

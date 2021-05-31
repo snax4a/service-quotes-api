@@ -1,5 +1,4 @@
-﻿using ServiceQuotes.Domain.Entities.Enums;
-using System;
+﻿using System;
 
 namespace ServiceQuotes.Application.DTOs.Quote
 {
@@ -9,5 +8,6 @@ namespace ServiceQuotes.Application.DTOs.Quote
         public int ReferenceNumber { get; set; }
         public decimal Total { get; set; }
         public string Status { get; set; }
+        public DateTime Created { get; set; }
     }
 }

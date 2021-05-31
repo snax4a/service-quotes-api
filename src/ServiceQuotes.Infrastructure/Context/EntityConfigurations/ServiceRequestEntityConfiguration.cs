@@ -17,6 +17,16 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
             builder.Property(sr => sr.Description).IsRequired();
 
             builder
+                .HasOne(sr => sr.Customer)
+                .WithMany(c => c.ServiceRequests)
+                .HasForeignKey(sr => sr.CustomerId);
+
+            builder
+                .HasOne(sr => sr.Address)
+                .WithMany(c => c.ServiceRequests)
+                .HasForeignKey(sr => sr.AddressId);
+
+            builder
                 .HasOne(sr => sr.CustomerAddress)
                 .WithMany(ca => ca.ServiceRequests)
                 .HasForeignKey(sr => new { sr.CustomerId, sr.AddressId });

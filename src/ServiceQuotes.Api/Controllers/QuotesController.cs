@@ -26,6 +26,12 @@ namespace ServiceQuotes.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<GetQuoteResponse>>> GetQuotes([FromQuery] GetQuotesFilter filter)
         {
+            if (Account.Role == Role.Customer)
+            {
+                var customer = await _customerRepository.GetByAccountId(Account.Id);
+                filter.CustomerId = customer.Id;
+            }
+
             return Ok(await _quoteService.GetAllQuotes(filter));
         }
 

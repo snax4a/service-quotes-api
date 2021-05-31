@@ -8,10 +8,10 @@ namespace ServiceQuotes.Application.Interfaces
 {
     public interface IQuoteService : IDisposable
     {
-        Task<List<GetQuoteResponse>> GetAllQuotes(GetQuotesFilter filter);
+        Task<List<GetQuoteWithServiceDetailsResponse>> GetAllQuotes(GetQuotesFilter filter);
 
-        Task<GetQuoteResponse> GetQuoteById(Guid id);
-        Task<List<GetQuoteResponse>> GetTopUnpaidQuotes(GetQuotesFilter filter);
+        Task<GetQuoteWithServiceDetailsResponse> GetQuoteById(Guid id);
+        Task<List<GetQuoteWithServiceDetailsResponse>> GetTopUnpaidQuotes(GetQuotesFilter filter);
 
         Task<GetQuoteResponse> UpdateQuoteStatus(Guid id, UpdateQuoteStatusRequest dto);
     }

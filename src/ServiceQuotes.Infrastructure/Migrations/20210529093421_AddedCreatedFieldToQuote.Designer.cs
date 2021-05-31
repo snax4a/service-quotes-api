@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ServiceQuotes.Infrastructure.Context;
@@ -9,9 +10,10 @@ using ServiceQuotes.Infrastructure.Context;
 namespace ServiceQuotes.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210529093421_AddedCreatedFieldToQuote")]
+    partial class AddedCreatedFieldToQuote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -338,8 +340,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.HasIndex("CustomerId", "AddressId");
 
                     b.ToTable("ServiceRequests");
@@ -552,27 +552,11 @@ namespace ServiceQuotes.Infrastructure.Migrations
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.ServiceRequest", b =>
                 {
-                    b.HasOne("ServiceQuotes.Domain.Entities.Address", "Address")
-                        .WithMany("ServiceRequests")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ServiceQuotes.Domain.Entities.Customer", "Customer")
-                        .WithMany("ServiceRequests")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ServiceQuotes.Domain.Entities.CustomerAddress", "CustomerAddress")
                         .WithMany("ServiceRequests")
                         .HasForeignKey("CustomerId", "AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Address");
-
-                    b.Navigation("Customer");
 
                     b.Navigation("CustomerAddress");
                 });
@@ -626,8 +610,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Address", b =>
                 {
                     b.Navigation("CustomerAddresses");
-
-                    b.Navigation("ServiceRequests");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.Customer", b =>
@@ -635,8 +617,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                     b.Navigation("CustomerAddresses");
 
                     b.Navigation("Payments");
-
-                    b.Navigation("ServiceRequests");
                 });
 
             modelBuilder.Entity("ServiceQuotes.Domain.Entities.CustomerAddress", b =>

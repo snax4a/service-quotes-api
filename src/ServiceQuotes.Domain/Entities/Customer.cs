@@ -11,6 +11,8 @@ namespace ServiceQuotes.Domain.Entities
         public Customer()
         {
             CustomerAddresses = new HashSet<CustomerAddress>();
+            Payments = new HashSet<Payment>();
+            ServiceRequests = new HashSet<ServiceRequest>();
         }
 
         public Guid AccountId { get; set; }
@@ -28,5 +30,6 @@ namespace ServiceQuotes.Domain.Entities
 
         public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
+        public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
     }
 }

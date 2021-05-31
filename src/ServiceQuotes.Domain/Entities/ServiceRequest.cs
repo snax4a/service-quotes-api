@@ -23,6 +23,8 @@ namespace ServiceQuotes.Domain.Entities
         public Guid CustomerId { get; set; }
         public Guid AddressId { get; set; }
 
+        public virtual Customer Customer { get; set; }
+        public virtual Address Address { get; set; }
         public virtual CustomerAddress CustomerAddress { get; set; }
         public virtual ICollection<ServiceRequestEmployee> ServiceRequestEmployees { get; set; }
         public virtual ICollection<Material> Materials { get; set; }
