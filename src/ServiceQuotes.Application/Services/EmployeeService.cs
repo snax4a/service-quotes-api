@@ -25,7 +25,7 @@ namespace ServiceQuotes.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<GetEmployeeResponse>> GetAllEmployees(GetEmployeesFilter filter)
+        public async Task<List<GetEmployeeWithSpecializationsResponse>> GetAllEmployees(GetEmployeesFilter filter)
         {
             // prepare filter predicate
             var predicate = PredicateBuilder.New<Employee>(true);
@@ -36,9 +36,23 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.Or(p => p.LastName.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
-            var employees = await _unitOfWork.Employees.Find(predicate);
+            var employees = await _unitOfWork.Employees.FindWithSpecializations(predicate);
 
-            return _mapper.Map<List<GetEmployeeResponse>>(employees);
+            return employees.Select(employee => new GetEmployeeWithSpecializationsResponse()
+            {
+                Id = employee.Id,
+                AccountId = employee.AccountId,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Specializations = employee.EmployeeSpecializations
+                    .Select(es => new GetSpecializationResponse()
+                    {
+                        Id = es.Specialization.Id,
+                        Name = es.Specialization.Name
+                    })
+                    .ToList()
+            })
+            .ToList();
         }
 
         public async Task<GetEmployeeWithSpecializationsResponse> GetEmployeeById(Guid id)

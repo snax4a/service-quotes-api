@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceQuotes.Api.Helpers;
 using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.JobValuation;
 using ServiceQuotes.Application.DTOs.Material;
 using ServiceQuotes.Application.DTOs.ServiceRequest;
 using ServiceQuotes.Application.Filters;
@@ -83,7 +84,7 @@ namespace ServiceQuotes.Api.Controllers
             return CreatedAtAction("GetServiceRequestById", new { id = newService.Id }, newService);
         }
 
-        [Authorize(Role.Manager, Role.Customer)]
+        [Authorize]
         [HttpPut("{id:guid}")]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]
@@ -97,9 +98,12 @@ namespace ServiceQuotes.Api.Controllers
             {
                 var customer = await _customerRepository.GetByAccountId(Account.Id);
 
-                // customer cant update this value
+                // customer cant update this values
                 if (dto.CustomerId.HasValue && dto.CustomerId != customer.Id)
-                    return Unauthorized(new { message = "Unauthorized" });
+                    return Unauthorized(new { message = "You are not allowed to update this value" });
+
+                if (dto.PlannedExecutionDate is not null)
+                    return Unauthorized(new { message = "You are not allowed to update this value" });
             }
 
             await _serviceRequestService.UpdateServiceRequest(id, dto);
@@ -107,14 +111,30 @@ namespace ServiceQuotes.Api.Controllers
             return NoContent();
         }
 
-        [Authorize(Role.Manager, Role.Employee)]
+        [Authorize]
         [HttpPut("{id:guid}/status")]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]
         public async Task<ActionResult> UpdateServiceStatus(Guid id, [FromBody] UpdateServiceStatusRequest dto)
         {
+            if (Account.Role == Role.Customer)
+            {
+                // customer can only change to cancelled status
+                if (dto.Status != Status.Cancelled)
+                    return Unauthorized(new { message = "You are not allowed to set this status." });
+            }
+
             await _serviceRequestService.UpdateServiceStatus(id, dto);
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{serviceRequestId:guid}/materials")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetMaterialResponse>> GetMaterials(Guid serviceRequestId)
+        {
+            return Ok(await _serviceRequestService.GetMaterials(serviceRequestId));
         }
 
         [Authorize(Role.Manager, Role.Employee)]
@@ -122,7 +142,7 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult<GetEmployeeResponse>> AddMaterial(Guid serviceRequestId, [FromBody] CreateMaterialRequest dto)
+        public async Task<ActionResult<GetMaterialResponse>> AddMaterial(Guid serviceRequestId, [FromBody] CreateMaterialRequest dto)
         {
             return Ok(await _serviceRequestService.AddMaterial(serviceRequestId, dto));
         }
@@ -135,6 +155,47 @@ namespace ServiceQuotes.Api.Controllers
         public async Task<ActionResult> RemoveMaterial(Guid serviceRequestId, Guid materialId)
         {
             await _serviceRequestService.RemoveMaterial(materialId);
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{serviceRequestId:guid}/job-valuations")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetServiceRequestJobValuationResponse>> GetJobValuations(Guid serviceRequestId)
+        {
+            return Ok(await _serviceRequestService.GetJobValuations(serviceRequestId));
+        }
+
+        [Authorize(Role.Manager, Role.Employee)]
+        [HttpPost("{serviceRequestId:guid}/job-valuations")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetJobValuationResponse>> AddJobValuation(Guid serviceRequestId, [FromBody] CreateJobValuationRequest dto)
+        {
+            return Ok(await _serviceRequestService.AddJobValuation(serviceRequestId, dto));
+        }
+
+        [Authorize(Role.Manager)]
+        [HttpPost("{serviceRequestId:guid}/employees")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetMaterialResponse>> AssignEmployee(Guid serviceRequestId, [FromBody] AssignEmployeeRequest dto)
+        {
+            await _serviceRequestService.AssignEmployee(serviceRequestId, dto);
+            return NoContent();
+        }
+
+        [Authorize(Role.Manager)]
+        [HttpDelete("{serviceRequestId:guid}/employees")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> RemoveEmployee(Guid serviceRequestId, [FromBody] RemoveEmployeeRequest dto)
+        {
+            await _serviceRequestService.RemoveEmployee(serviceRequestId, dto);
             return NoContent();
         }
     }

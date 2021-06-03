@@ -37,6 +37,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(sr => sr.CustomerAddress)
                             .ThenInclude(ca => ca.Address)
                         .Where(predicate)
+                        .OrderByDescending(sr => sr.Created)
                         .ToListAsync();
         }
 
@@ -82,6 +83,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                                 }
                             }
                         })
+                        .OrderByDescending(sr => sr.Created)
                         .AsNoTracking()
                         .ToListAsync();
         }

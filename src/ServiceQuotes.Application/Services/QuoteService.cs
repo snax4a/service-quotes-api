@@ -34,8 +34,10 @@ namespace ServiceQuotes.Application.Services
 
             if (!string.IsNullOrEmpty(filter?.SearchString))
             {
-                predicate = predicate.Or(p => p.ReferenceNumber.Equals(filter.SearchString.ToLower()));
-                predicate = predicate.Or(p => p.Status.Equals(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.ServiceRequest.Title.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.ServiceRequest.Customer.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.ServiceRequest.Address.Street.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.ServiceRequest.Address.City.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(filter?.DateRange))
@@ -43,13 +45,13 @@ namespace ServiceQuotes.Application.Services
                 switch (filter.DateRange)
                 {
                     case "30-days":
-                        predicate = predicate.Or(p => p.Created >= DateTime.UtcNow.AddDays(-30));
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-30));
                         break;
                     case "7-days":
-                        predicate = predicate.Or(p => p.Created >= DateTime.UtcNow.AddDays(-7));
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-7));
                         break;
                     case "today":
-                        predicate = predicate.Or(p => p.Created.Date == DateTime.UtcNow.Date);
+                        predicate = predicate.And(p => p.Created.Date == DateTime.UtcNow.Date);
                         break;
                 }
             }

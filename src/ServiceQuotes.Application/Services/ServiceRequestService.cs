@@ -3,6 +3,7 @@ using LinqKit;
 using ServiceQuotes.Application.DTOs.Customer;
 using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.JobValuation;
 using ServiceQuotes.Application.DTOs.Material;
 using ServiceQuotes.Application.DTOs.ServiceRequest;
 using ServiceQuotes.Application.DTOs.Specialization;
@@ -38,6 +39,9 @@ namespace ServiceQuotes.Application.Services
             if (!string.IsNullOrEmpty(filter?.SearchString))
             {
                 predicate = predicate.Or(p => p.Title.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Customer.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Address.Street.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Address.City.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             if (account.Role == Role.Customer)
@@ -45,6 +49,27 @@ namespace ServiceQuotes.Application.Services
                 // customer can get only his own service requests
                 var customer = await _unitOfWork.Customers.GetByAccountId(account.Id);
                 predicate = predicate.And(p => p.CustomerId == customer.Id);
+            }
+
+            if (!string.IsNullOrEmpty(filter?.DateRange))
+            {
+                switch (filter.DateRange)
+                {
+                    case "30-days":
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-30));
+                        break;
+                    case "7-days":
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-7));
+                        break;
+                    case "today":
+                        predicate = predicate.And(p => p.Created.Date == DateTime.UtcNow.Date);
+                        break;
+                }
+            }
+
+            if (filter.Status is not null)
+            {
+                predicate = predicate.And(p => p.Status.Equals(filter.Status));
             }
 
             var serviceRequests = await _unitOfWork.ServiceRequests.FindWithAddress(predicate);
@@ -75,6 +100,9 @@ namespace ServiceQuotes.Application.Services
             if (!string.IsNullOrEmpty(filter?.SearchString))
             {
                 predicate = predicate.Or(p => p.Title.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Customer.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Address.Street.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Address.City.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             if (account.Role == Role.Employee)
@@ -82,6 +110,27 @@ namespace ServiceQuotes.Application.Services
                 // employee can get only service requests he is assigned to
                 var employee = await _unitOfWork.Employees.GetByAccountId(account.Id);
                 predicate = predicate.And(p => p.ServiceRequestEmployees.Any(sre => sre.EmployeeId == employee.Id));
+            }
+
+            if (!string.IsNullOrEmpty(filter?.DateRange))
+            {
+                switch (filter.DateRange)
+                {
+                    case "30-days":
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-30));
+                        break;
+                    case "7-days":
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-7));
+                        break;
+                    case "today":
+                        predicate = predicate.And(p => p.Created.Date == DateTime.UtcNow.Date);
+                        break;
+                }
+            }
+
+            if (filter.Status is not null)
+            {
+                predicate = predicate.And(p => p.Status.Equals(filter.Status));
             }
 
             var serviceRequests = await _unitOfWork.ServiceRequests
@@ -244,6 +293,18 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetServiceResponse>(serviceRequest);
         }
 
+        public async Task<List<GetMaterialResponse>> GetMaterials(Guid serviceRequestId)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
+
+            // validate
+            if (serviceRequest is null)
+                throw new KeyNotFoundException("Service request does not exist.");
+
+            var materials = await _unitOfWork.Materials.GetAllByServiceRequestId(serviceRequestId);
+            return _mapper.Map<List<GetMaterialResponse>>(materials);
+        }
+
         public async Task<GetMaterialResponse> AddMaterial(Guid serviceRequestId, CreateMaterialRequest dto)
         {
             var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
@@ -273,6 +334,131 @@ namespace ServiceQuotes.Application.Services
                 throw new KeyNotFoundException("Material does not exist.");
 
             _unitOfWork.Materials.Remove(material);
+            _unitOfWork.Commit();
+        }
+
+        public async Task<List<GetServiceRequestJobValuationResponse>> GetJobValuations(Guid serviceRequestId)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
+
+            // validate
+            if (serviceRequest is null)
+                throw new KeyNotFoundException("Service request does not exist.");
+
+            var jobValuations = await _unitOfWork.ServiceRequestJobValuations.GetAllByServiceRequestId(serviceRequestId);
+
+            return jobValuations.Select(jv => new GetServiceRequestJobValuationResponse()
+            {
+                JobValuation = _mapper.Map<GetJobValuationResponse>(jv.JobValuation),
+                ServiceRequestId = jv.ServiceRequestId,
+                Date = jv.Date,
+                Employee = new GetEmployeeWithAccountImageResponse()
+                {
+                    Id = jv.Employee.Id,
+                    FirstName = jv.Employee.FirstName,
+                    LastName = jv.Employee.LastName,
+                    AccountId = jv.Employee.AccountId,
+                    Image = jv.Employee.Account.Image,
+                    Specializations = jv.Employee.EmployeeSpecializations
+                        .Select(es => new GetSpecializationResponse()
+                        {
+                            Id = es.Specialization.Id,
+                            Name = es.Specialization.Name
+                        })
+                        .ToList(),
+                }
+            })
+            .ToList();
+        }
+
+        public async Task<GetJobValuationResponse> AddJobValuation(Guid serviceRequestId, CreateJobValuationRequest dto)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
+
+            // validate
+            if (serviceRequest is null)
+                throw new KeyNotFoundException("Service request does not exist.");
+
+            if (serviceRequest.Status != Status.InProgress)
+                throw new AppException("This service is not in progress.");
+
+            var employee = await _unitOfWork.Employees.Get(new Guid(dto.EmployeeId));
+
+            if (employee is null)
+                throw new KeyNotFoundException("Employee does not exist.");
+
+            var newJobValuation = _mapper.Map<JobValuation>(dto);
+            newJobValuation.Id = Guid.NewGuid();
+
+            var newSRJobValuation = new ServiceRequestJobValuation()
+            {
+                EmployeeId = employee.Id,
+                JobValuationId = newJobValuation.Id,
+                ServiceRequestId = serviceRequest.Id,
+                Date = DateTime.UtcNow
+            };
+
+            _unitOfWork.JobValuations.Add(newJobValuation);
+            _unitOfWork.ServiceRequestJobValuations.Add(newSRJobValuation);
+            _unitOfWork.Commit();
+
+            return _mapper.Map<GetJobValuationResponse>(newJobValuation);
+        }
+
+        public async Task RemoveJobValuation(Guid jobValuationId)
+        {
+            var jobValuation = await _unitOfWork.ServiceRequestJobValuations.GetByJobValuationId(jobValuationId);
+
+            // validate
+            if (jobValuation is null)
+                throw new KeyNotFoundException("JobValuation does not exist.");
+
+            _unitOfWork.ServiceRequestJobValuations.Remove(jobValuation);
+            _unitOfWork.Commit();
+        }
+
+        public async Task AssignEmployee(Guid serviceRequestId, AssignEmployeeRequest dto)
+        {
+            var employeeId = new Guid(dto.EmployeeId);
+            var employee = await _unitOfWork.Employees.Get(employeeId);
+            var serviceEmployee = await _unitOfWork.ServiceRequestEmployees.Get(serviceRequestId, employeeId);
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
+
+            // validate
+            if (employee is null)
+                throw new AppException("Employee does not exist.");
+
+            if (serviceRequest is null)
+                throw new AppException("Service request does not exist.");
+
+            if (serviceEmployee is not null)
+                throw new AppException("Employee is already assigned to this service.");
+
+            var newServiceEmployee = new ServiceRequestEmployee()
+            {
+                ServiceRequestId = serviceRequestId,
+                EmployeeId = employeeId
+            };
+
+            if (serviceRequest.Status == Status.New)
+            {
+                serviceRequest.Status = Status.Assigned;
+            }
+
+            _unitOfWork.ServiceRequestEmployees.Add(newServiceEmployee);
+            _unitOfWork.Commit();
+        }
+
+        public async Task RemoveEmployee(Guid serviceRequestId, AssignEmployeeRequest dto)
+        {
+            var employeeId = new Guid(dto.EmployeeId);
+            var serviceEmployee = await _unitOfWork.ServiceRequestEmployees.Get(serviceRequestId, employeeId);
+
+            // validate
+            if (serviceEmployee is null)
+                throw new KeyNotFoundException("Employee is not assigned to this service.");
+
+            _unitOfWork.ServiceRequestEmployees.Remove(serviceEmployee);
             _unitOfWork.Commit();
         }
 

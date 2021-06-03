@@ -3,6 +3,7 @@ using ServiceQuotes.Application.DTOs.Account;
 using ServiceQuotes.Application.DTOs.Customer;
 using ServiceQuotes.Application.DTOs.CustomerAddress;
 using ServiceQuotes.Application.DTOs.Employee;
+using ServiceQuotes.Application.DTOs.JobValuation;
 using ServiceQuotes.Application.DTOs.Material;
 using ServiceQuotes.Application.DTOs.Payment;
 using ServiceQuotes.Application.DTOs.Quote;
@@ -74,6 +75,11 @@ namespace ServiceQuotes.Application.MappingProfiles
             CreateMap<Payment, GetPaymentResponse>().ReverseMap();
             CreateMap<CreatePaymentRequest, Quote>();
             CreateMap<UpdatePaymentStatusRequest, Quote>();
+
+            // JobValuation Map
+            CreateMap<JobValuation, GetJobValuationResponse>().ReverseMap();
+            CreateMap<CreateJobValuationRequest, JobValuation>();
+            CreateMap<ServiceRequestJobValuation, GetServiceRequestJobValuationResponse>().ReverseMap();
         }
     }
 }

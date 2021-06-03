@@ -8,7 +8,7 @@ namespace ServiceQuotes.Application.Interfaces
 {
     public interface IEmployeeService : IDisposable
     {
-        Task<List<GetEmployeeResponse>> GetAllEmployees(GetEmployeesFilter filter);
+        Task<List<GetEmployeeWithSpecializationsResponse>> GetAllEmployees(GetEmployeesFilter filter);
 
         Task<GetEmployeeWithSpecializationsResponse> GetEmployeeById(Guid id);
 

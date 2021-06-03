@@ -34,6 +34,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(q => q.ServiceRequest)
                             .ThenInclude(sr => sr.Address)
                         .Where(predicate)
+                        .OrderByDescending(q => q.Created)
                         .ToListAsync();
         }
 
@@ -46,7 +47,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(q => q.ServiceRequest)
                             .ThenInclude(sr => sr.Address)
                         .Where(q => q.Status == status)
-                        .OrderBy(q => q.ServiceRequest.CompletionDate)
+                        .OrderByDescending(q => q.Created)
                         .Take(count)
                         .ToListAsync();
         }
@@ -59,7 +60,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(q => q.ServiceRequest)
                             .ThenInclude(sr => sr.Address)
                         .Where(q => q.Status == status && q.ServiceRequest.CustomerId == customerId)
-                        .OrderBy(q => q.ServiceRequest.CompletionDate)
+                        .OrderByDescending(q => q.Created)
                         .Take(count)
                         .ToListAsync();
         }

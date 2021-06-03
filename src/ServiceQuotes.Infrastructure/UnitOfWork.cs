@@ -20,6 +20,9 @@ namespace ServiceQuotes.Infrastructure
         private readonly Lazy<IServiceRequestRepository> _serviceRequestRepository;
         private readonly Lazy<IMaterialRepository> _materialRepository;
         private readonly Lazy<IPaymentRepository> _paymentRepository;
+        private readonly Lazy<IJobValuationRepository> _jobValuationRepository;
+        private readonly Lazy<IServiceRequestJobValuationRepository> _serviceRequestJobValuationRepository;
+        private readonly Lazy<IServiceRequestEmployeeRepository> _serviceRequestEmployeeRepository;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -34,6 +37,9 @@ namespace ServiceQuotes.Infrastructure
             _serviceRequestRepository = new Lazy<IServiceRequestRepository>(() => new ServiceRequestRepository(context));
             _materialRepository = new Lazy<IMaterialRepository>(() => new MaterialRepository(context));
             _paymentRepository = new Lazy<IPaymentRepository>(() => new PaymentRepository(context));
+            _jobValuationRepository = new Lazy<IJobValuationRepository>(() => new JobValuationRepository(context));
+            _serviceRequestJobValuationRepository = new Lazy<IServiceRequestJobValuationRepository>(() => new ServiceRequestJobValuationRepository(context));
+            _serviceRequestEmployeeRepository = new Lazy<IServiceRequestEmployeeRepository>(() => new ServiceRequestEmployeeRepository(context));
         }
 
         public IAccountRepository Accounts
@@ -81,10 +87,24 @@ namespace ServiceQuotes.Infrastructure
             get { return _materialRepository.Value; }
         }
 
-        
         public IPaymentRepository Payments
         {
             get { return _paymentRepository.Value; }
+        }
+
+        public IJobValuationRepository JobValuations
+        {
+            get { return _jobValuationRepository.Value; }
+        }
+
+        public IServiceRequestJobValuationRepository ServiceRequestJobValuations
+        {
+            get { return _serviceRequestJobValuationRepository.Value; }
+        }
+
+        public IServiceRequestEmployeeRepository ServiceRequestEmployees
+        {
+            get { return _serviceRequestEmployeeRepository.Value; }
         }
 
         public void Commit()

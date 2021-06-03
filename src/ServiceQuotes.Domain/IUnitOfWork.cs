@@ -16,6 +16,9 @@ namespace ServiceQuotes.Domain
         IServiceRequestRepository ServiceRequests { get; }
         IMaterialRepository Materials { get; }
         IPaymentRepository Payments { get; }
+        IJobValuationRepository JobValuations { get; }
+        IServiceRequestJobValuationRepository ServiceRequestJobValuations { get; }
+        IServiceRequestEmployeeRepository ServiceRequestEmployees { get; }
 
         void Commit();
         Task CommitAsync();

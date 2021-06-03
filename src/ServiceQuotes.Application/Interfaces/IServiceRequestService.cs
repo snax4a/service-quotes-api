@@ -1,4 +1,5 @@
-﻿using ServiceQuotes.Application.DTOs.Material;
+﻿using ServiceQuotes.Application.DTOs.JobValuation;
+using ServiceQuotes.Application.DTOs.Material;
 using ServiceQuotes.Application.DTOs.ServiceRequest;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Domain.Entities;
@@ -22,8 +23,20 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<GetServiceResponse> UpdateServiceStatus(Guid id, UpdateServiceStatusRequest dto);
 
+        Task<List<GetMaterialResponse>> GetMaterials(Guid serviceRequestId);
+
         Task<GetMaterialResponse> AddMaterial(Guid serviceRequestId, CreateMaterialRequest dto);
 
         Task RemoveMaterial(Guid materialId);
+
+        Task<List<GetServiceRequestJobValuationResponse>> GetJobValuations(Guid serviceRequestId);
+
+        Task<GetJobValuationResponse> AddJobValuation(Guid serviceRequestId, CreateJobValuationRequest dto);
+
+        Task RemoveJobValuation(Guid jobValuationId);
+
+        Task AssignEmployee(Guid serviceRequestId, AssignEmployeeRequest dto);
+
+        Task RemoveEmployee(Guid serviceRequestId, AssignEmployeeRequest dto);
     }
 }
