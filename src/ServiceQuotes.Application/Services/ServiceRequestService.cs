@@ -155,7 +155,7 @@ namespace ServiceQuotes.Application.Services
                     VatNumber = sr.CustomerAddress.Customer.VatNumber,
                     Image = sr.CustomerAddress.Customer.Account.Image
                 },
-                Address = _mapper.Map<GetAddressResponse>(sr.CustomerAddress.Address)
+                CustomerAddress = _mapper.Map<GetCustomerAddressResponse>(sr.CustomerAddress),
             })
             .ToList();
         }
@@ -178,8 +178,15 @@ namespace ServiceQuotes.Application.Services
                 Created = serviceRequest.Created,
                 CustomerId = serviceRequest.CustomerId,
                 AddressId = serviceRequest.AddressId,
-                Customer = _mapper.Map<GetCustomerResponse>(serviceRequest.CustomerAddress.Customer),
-                Address = _mapper.Map<GetAddressResponse>(serviceRequest.CustomerAddress.Address),
+                Customer = new GetCustomerWithImageResponse()
+                {
+                    Id = serviceRequest.CustomerAddress.Customer.Id,
+                    AccountId = serviceRequest.CustomerAddress.Customer.AccountId,
+                    CompanyName = serviceRequest.CustomerAddress.Customer.CompanyName,
+                    VatNumber = serviceRequest.CustomerAddress.Customer.VatNumber,
+                    Image = serviceRequest.CustomerAddress.Customer.Account.Image,
+                },
+                CustomerAddress = _mapper.Map<GetCustomerAddressResponse>(serviceRequest.CustomerAddress),
                 AssignedEmployees = serviceRequest.ServiceRequestEmployees
                     .Select(sre => new GetEmployeeWithAccountImageResponse()
                     {
@@ -405,9 +412,12 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetJobValuationResponse>(newJobValuation);
         }
 
-        public async Task RemoveJobValuation(Guid jobValuationId)
+        public async Task RemoveJobValuation(RemoveJobValuationRequest dto)
         {
-            var jobValuation = await _unitOfWork.ServiceRequestJobValuations.GetByJobValuationId(jobValuationId);
+            var employeeId = new Guid(dto.EmployeeId);
+            var jobValuationId = new Guid(dto.JobValuationId);
+            var serviceRequestId = new Guid(dto.ServiceRequestId);
+            var jobValuation = await _unitOfWork.ServiceRequestJobValuations.Get(employeeId, jobValuationId, serviceRequestId);
 
             // validate
             if (jobValuation is null)

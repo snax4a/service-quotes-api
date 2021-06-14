@@ -17,6 +17,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
         {
             return await _entities
                         .Where(m => m.ServiceRequestId == serviceRequestId)
+                        .OrderBy(m => m.Description)
                         .ToListAsync();
         }
     }

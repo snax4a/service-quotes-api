@@ -177,6 +177,17 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(await _serviceRequestService.AddJobValuation(serviceRequestId, dto));
         }
 
+        [Authorize(Role.Manager, Role.Employee)]
+        [HttpDelete("{serviceRequestId:guid}/job-valuations")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetJobValuationResponse>> RemoveJobValuation(Guid serviceRequestId, [FromBody] RemoveJobValuationRequest dto)
+        {
+            await _serviceRequestService.RemoveJobValuation(dto);
+            return NoContent();
+        }
+
         [Authorize(Role.Manager)]
         [HttpPost("{serviceRequestId:guid}/employees")]
         [ProducesResponseType(204)]

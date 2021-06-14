@@ -33,7 +33,7 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<GetJobValuationResponse> AddJobValuation(Guid serviceRequestId, CreateJobValuationRequest dto);
 
-        Task RemoveJobValuation(Guid jobValuationId);
+        Task RemoveJobValuation(RemoveJobValuationRequest dto);
 
         Task AssignEmployee(Guid serviceRequestId, AssignEmployeeRequest dto);
 

@@ -21,6 +21,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                             .ThenInclude(ca => ca.Address)
                         .Include(sr => sr.CustomerAddress)
                             .ThenInclude(ca => ca.Customer)
+                                .ThenInclude(c => c.Account)
                         .Include(sr => sr.ServiceRequestEmployees)
                             .ThenInclude(sre => sre.Employee)
                                 .ThenInclude(e => e.EmployeeSpecializations)

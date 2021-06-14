@@ -47,6 +47,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(jv => jv.Employee)
                             .ThenInclude(e => e.Account)
                         .Where(jv => jv.ServiceRequestId == serviceRequestId)
+                        .OrderBy(jv => jv.Date)
                         .ToListAsync();
         }
 
@@ -57,6 +58,7 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(jv => jv.Employee)
                             .ThenInclude(e => e.Account)
                         .Where(jv => jv.EmployeeId == employeeId)
+                        .OrderBy(jv => jv.Date)
                         .ToListAsync();
         }
     }
