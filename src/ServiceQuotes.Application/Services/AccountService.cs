@@ -153,11 +153,21 @@ namespace ServiceQuotes.Application.Services
         public async Task<GetAccountResponse> UpdateAccount(Guid id, UpdateAccountRequest dto)
         {
             var account = await _unitOfWork.Accounts.Get(id);
-            if (account is null) throw new KeyNotFoundException();
+            if (account is null)
+                throw new KeyNotFoundException("Account does not exist.");
 
-            // hash password if it was entered
             if (!string.IsNullOrEmpty(dto.Password))
+            {
+                // validate
+                if (dto.Password != dto.PasswordRepeat)
+                    throw new AppException("Passwords do not match.");
+
+                if (dto.Password.Length < 6)
+                    throw new AppException("Password must be at least 6 characters long.");
+
+                // hash password
                 account.PasswordHash = Utilities.HashPassword(dto.Password);
+            }
 
             if (!string.IsNullOrEmpty(dto.Email) && account.Email != dto.Email)
             {
@@ -165,6 +175,16 @@ namespace ServiceQuotes.Application.Services
                     throw new AppException($"Email '{dto.Email}' is already taken");
 
                 account.Email = dto.Email;
+            }
+
+            if (dto.Image?.Length > 0)
+            {
+                var isValidImage = Utilities.IsValidImage(dto.Image);
+
+                if (!isValidImage)
+                    throw new AppException("Uploaded image is invalid.");
+
+                account.Image = dto.Image;
             }
 
             account.Updated = DateTime.Now;

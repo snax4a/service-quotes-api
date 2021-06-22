@@ -1,8 +1,10 @@
-using System;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Drawing;
+using System.IdentityModel.Tokens.Jwt;
+using System.IO;
+using System.Security.Claims;
+using System.Text;
 using BC = BCrypt.Net.BCrypt;
 
 namespace ServiceQuotes.Application.Helpers
@@ -48,6 +50,22 @@ namespace ServiceQuotes.Application.Helpers
         public static bool VerifyPassword(string password, string passwordHash)
         {
             return BC.Verify(password, passwordHash);
+        }
+
+        public static bool IsValidImage(byte[] bytes)
+        {
+            try
+            {
+                using (MemoryStream ms = new MemoryStream(bytes))
+                {
+                    Image.FromStream(ms);
+                }
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

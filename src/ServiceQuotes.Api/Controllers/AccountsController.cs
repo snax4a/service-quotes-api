@@ -110,8 +110,8 @@ namespace ServiceQuotes.Api.Controllers
             if (id != Account.Id && Account.Role != Role.Manager)
                 return Unauthorized(new { message = "Unauthorized" });
 
-            await _accountService.UpdateAccount(id, dto);
-            return NoContent();
+            var account = await _accountService.UpdateAccount(id, dto);
+            return Ok(account);
         }
 
         [Authorize]
