@@ -159,7 +159,7 @@ namespace ServiceQuotes.Application.Services
             if (!string.IsNullOrEmpty(dto.Password))
             {
                 // validate
-                if (dto.Password != dto.PasswordRepeat)
+                if (dto.Password != dto.RepeatPassword)
                     throw new AppException("Passwords do not match.");
 
                 if (dto.Password.Length < 6)

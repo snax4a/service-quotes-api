@@ -314,7 +314,7 @@ namespace ServiceQuotes.Api.IntegrationTests
 
         [Theory]
         [InlineData("8720c542-7784-460a-91ca-31bf633eae50")]
-        public async Task Put_ValidAccount_ReturnsNoContent(Guid id)
+        public async Task Put_ValidAccount_ReturnsOk(Guid id)
         {
             // Arrange
             var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
@@ -324,14 +324,14 @@ namespace ServiceQuotes.Api.IntegrationTests
             var newAccount = JsonConvert.SerializeObject(new
             {
                 Email = "customer2@test.com",
-                Password = "newPassword12435",
+                Password = "newPassword12345",
                 RepeatPassword = "newPassword12345",
             });
             var content = new StringContent(newAccount, Encoding.UTF8, "application/json");
             var response = await client.PutAsync($"/api/accounts/{id}", content);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Theory]
