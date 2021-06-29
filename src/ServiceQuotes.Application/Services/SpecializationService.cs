@@ -76,9 +76,8 @@ namespace ServiceQuotes.Application.Services
 
         public async Task RemoveSpecialization(Guid specializationId)
         {
-            Console.WriteLine("### Value: " + specializationId);
             var specialization = await _unitOfWork.Specializations.Get(specializationId);
-            Console.WriteLine("### Object: " + specialization);
+
             // validate
             if (specialization is null)
                 throw new KeyNotFoundException("Specialization does not exist.");

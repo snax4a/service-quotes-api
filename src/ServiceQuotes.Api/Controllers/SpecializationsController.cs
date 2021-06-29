@@ -77,7 +77,6 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult> RemoveSpecialization(Guid specializationId)
         {
-            Console.WriteLine("### Value: " + specializationId);
             await _specializationService.RemoveSpecialization(specializationId);
             return NoContent();
         }
