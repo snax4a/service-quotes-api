@@ -74,10 +74,14 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetSpecializationResponse>(specialization);
         }
 
-        public async Task DeleteSpecialization(Guid id)
+        public async Task RemoveSpecialization(Guid specializationId)
         {
-            var specialization = await _unitOfWork.Specializations.Get(id);
-            if (specialization is null) throw new KeyNotFoundException();
+            Console.WriteLine("### Value: " + specializationId);
+            var specialization = await _unitOfWork.Specializations.Get(specializationId);
+            Console.WriteLine("### Object: " + specialization);
+            // validate
+            if (specialization is null)
+                throw new KeyNotFoundException("Specialization does not exist.");
 
             _unitOfWork.Specializations.Remove(specialization);
             _unitOfWork.Commit();

@@ -15,5 +15,6 @@ namespace ServiceQuotes.Application.Interfaces
         Task<GetSpecializationResponse> CreateSpecialization(CreateSpecializationRequest dto);
 
         Task<GetSpecializationResponse> UpdateSpecialization(Guid id, UpdateSpecializationRequest dto);
+        Task RemoveSpecialization(Guid specializationId);
     }
 }
