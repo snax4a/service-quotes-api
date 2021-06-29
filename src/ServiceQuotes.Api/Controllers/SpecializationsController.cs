@@ -46,17 +46,17 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Manager)]
-        [HttpPut("{id:guid}")]
+        [HttpPut("{specializationId:guid}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(204)]
-        public async Task<ActionResult<GetSpecializationResponse>> UpdateSpecialization(Guid id, [FromBody] UpdateSpecializationRequest dto)
+        public async Task<ActionResult<GetSpecializationResponse>> UpdateSpecialization(Guid specializationId, [FromBody] UpdateSpecializationRequest dto)
         {
-            var specialization = await _specializationService.GetSpecializationById(id);
+            var specialization = await _specializationService.GetSpecializationById(specializationId);
 
             if (specialization is null) return NotFound();
 
-            await _specializationService.UpdateSpecialization(id, dto);
+            await _specializationService.UpdateSpecialization(specializationId, dto);
 
             return NoContent();
         }
@@ -68,6 +68,18 @@ namespace ServiceQuotes.Api.Controllers
         {
             var specialization = await _specializationService.CreateSpecialization(dto);
             return CreatedAtAction("GetSpecializationById", new { id = specialization.Id }, specialization);
+        }
+
+        [Authorize(Role.Manager)]
+        [HttpDelete("{specializationId:guid}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> RemoveSpecialization(Guid specializationId)
+        {
+            Console.WriteLine("### Value: " + specializationId);
+            await _specializationService.RemoveSpecialization(specializationId);
+            return NoContent();
         }
     }
 }
