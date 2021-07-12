@@ -36,6 +36,13 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.Or(p => p.LastName.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
+            var specializationId = new Guid();
+            
+            if (!string.IsNullOrEmpty(filter?.SpecializationId) && Guid.TryParse(filter?.SpecializationId, out specializationId))
+            {
+                predicate = predicate.And(p => p.EmployeeSpecializations.Any(x => x.SpecializationId == specializationId));
+            }
+
             var employees = await _unitOfWork.Employees.FindWithSpecializations(predicate);
 
             return employees.Select(employee => new GetEmployeeWithSpecializationsResponse()
