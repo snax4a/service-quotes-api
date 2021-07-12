@@ -207,6 +207,38 @@ namespace ServiceQuotes.Application.Services
             };
         }
 
+        public async Task<List<GetServiceDetailsResponse>> GetServicesAssignedToEmployee(Guid employeeId)
+        {
+            // prepare filter predicate
+            var predicate = PredicateBuilder.New<ServiceRequest>(true);
+            predicate = predicate.And(p => p.ServiceRequestEmployees.Any(sre => sre.EmployeeId == employeeId));
+
+            var serviceRequests = await _unitOfWork.ServiceRequests.FindWithCustomerAndAddressAndEmployees(predicate);
+
+            return serviceRequests.Select(sr => new GetServiceDetailsResponse()
+            {
+                Id = sr.Id,
+                Title = sr.Title,
+                Description = sr.Description,
+                PlannedExecutionDate = sr.PlannedExecutionDate,
+                CompletionDate = sr.CompletionDate,
+                Created = sr.Created,
+                CustomerId = sr.CustomerId,
+                AddressId = sr.AddressId,
+                Status = sr.Status.ToString(),
+                Customer = new GetCustomerWithImageResponse()
+                {
+                    Id = sr.CustomerAddress.Customer.Id,
+                    AccountId = sr.CustomerAddress.Customer.AccountId,
+                    CompanyName = sr.CustomerAddress.Customer.CompanyName,
+                    VatNumber = sr.CustomerAddress.Customer.VatNumber,
+                    Image = sr.CustomerAddress.Customer.Account.Image
+                },
+                CustomerAddress = _mapper.Map<GetCustomerAddressResponse>(sr.CustomerAddress),
+            })
+            .ToList();
+        }
+
         public async Task<GetServiceResponse> CreateServiceRequest(CreateServiceRequest dto)
         {
             var customer = await _unitOfWork.Customers.GetWithAddresses(new Guid(dto.CustomerId));

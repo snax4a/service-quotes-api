@@ -65,6 +65,20 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(serviceRequest);
         }
 
+        [Authorize(Role.Manager)]
+        [HttpGet("assigned/{employeeId:guid}")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(GetServiceDetailsResponse), 200)]
+        public async Task<ActionResult<GetServiceDetailsResponse>> GetServicesAssignedToEmployee(Guid employeeId)
+        {
+            var serviceRequest = await _serviceRequestService.GetServicesAssignedToEmployee(employeeId);
+
+            if (serviceRequest is null) return NotFound();
+
+            return Ok(serviceRequest);
+        }
+
         [Authorize(Role.Manager, Role.Customer)]
         [HttpPost]
         [ProducesResponseType(404)]

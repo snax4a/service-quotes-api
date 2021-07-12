@@ -14,14 +14,10 @@ namespace ServiceQuotes.Api.Controllers
     public class SpecializationsController : BaseController<SpecializationsController>
     {
         private readonly ISpecializationService _specializationService;
-        private readonly ILogger _logger;
 
-        public SpecializationsController(
-            ISpecializationService specializationService,
-            ILogger<SpecializationsController> logger)
+        public SpecializationsController(ISpecializationService specializationService)
         {
             _specializationService = specializationService;
-            _logger = logger;
         }
 
         [Authorize(Role.Manager)]

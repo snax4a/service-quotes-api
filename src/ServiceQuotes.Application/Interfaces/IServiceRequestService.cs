@@ -17,6 +17,8 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<GetServiceDetailsResponse> GetServiceRequestById(Guid id);
 
+        Task<List<GetServiceDetailsResponse>> GetServicesAssignedToEmployee(Guid employeeId);
+
         Task<GetServiceResponse> CreateServiceRequest(CreateServiceRequest dto);
 
         Task<GetServiceResponse> UpdateServiceRequest(Guid id, UpdateServiceRequest dto);
