@@ -72,9 +72,9 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
-        public ActionResult<GetEmployeeResponse> RemoveSpecialization(Guid employeeId, Guid specializationId)
+        public async Task<ActionResult<GetEmployeeResponse>> RemoveSpecialization(Guid employeeId, Guid specializationId)
         {
-            _employeeService.RemoveSpecialization(employeeId, specializationId);
+            await _employeeService.RemoveSpecialization(employeeId, specializationId);
             return NoContent();
         }
     }

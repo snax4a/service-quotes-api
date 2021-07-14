@@ -37,7 +37,7 @@ namespace ServiceQuotes.Application.Services
             }
 
             var specializationId = new Guid();
-            
+
             if (!string.IsNullOrEmpty(filter?.SpecializationId) && Guid.TryParse(filter?.SpecializationId, out specializationId))
             {
                 predicate = predicate.And(p => p.EmployeeSpecializations.Any(x => x.SpecializationId == specializationId));
@@ -140,7 +140,7 @@ namespace ServiceQuotes.Application.Services
             return await GetEmployeeById(employee.Id);
         }
 
-        public async void RemoveSpecialization(Guid employeeId, Guid specializationId)
+        public async Task RemoveSpecialization(Guid employeeId, Guid specializationId)
         {
             var employee = await _unitOfWork.Employees.GetWithSpecializations(employeeId);
 
@@ -148,15 +148,13 @@ namespace ServiceQuotes.Application.Services
             if (employee is null)
                 throw new KeyNotFoundException("Employee does not exist.");
 
-            var isRemoved = employee.EmployeeSpecializations.Remove(new EmployeeSpecialization
-            {
-                EmployeeId = employeeId,
-                SpecializationId = specializationId
-            });
+            var specialization = employee.EmployeeSpecializations
+                .FirstOrDefault(es => es.SpecializationId == specializationId);
 
-            if (!isRemoved)
+            if (specialization is null)
                 throw new KeyNotFoundException("Specialization not found in employee specializations.");
 
+            employee.EmployeeSpecializations.Remove(specialization);
             _unitOfWork.Commit();
         }
 

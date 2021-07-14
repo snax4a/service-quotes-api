@@ -17,6 +17,6 @@ namespace ServiceQuotes.Application.Interfaces
         Task<GetEmployeeResponse> UpdateEmployee(Guid id, UpdateEmployeeRequest dto);
 
         Task<GetEmployeeWithSpecializationsResponse> AddSpecialization(Guid employeeId, Guid specializationId);
-        void RemoveSpecialization(Guid employeeId, Guid specializationId);
+        Task RemoveSpecialization(Guid employeeId, Guid specializationId);
     }
 }
