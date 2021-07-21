@@ -187,6 +187,28 @@ namespace ServiceQuotes.Application.Services
                 account.Image = dto.Image;
             }
 
+            // update role specific fields
+            if (account.Role == Role.Customer)
+            {
+                var customer = await _unitOfWork.Customers.GetByAccountId(account.Id);
+
+                if (!string.IsNullOrEmpty(dto.CompanyName) && customer.CompanyName != dto.CompanyName)
+                    customer.CompanyName = dto.CompanyName;
+
+                if (!string.IsNullOrEmpty(dto.VatNumber) && customer.VatNumber != dto.VatNumber)
+                    customer.VatNumber = dto.VatNumber;
+            }
+            else
+            {
+                var employee = await _unitOfWork.Employees.GetByAccountId(account.Id);
+
+                if (!string.IsNullOrEmpty(dto.FirstName) && employee.FirstName != dto.FirstName)
+                    employee.FirstName = dto.FirstName;
+
+                if (!string.IsNullOrEmpty(dto.LastName) && employee.LastName != dto.LastName)
+                    employee.LastName = dto.LastName;
+            }
+
             account.Updated = DateTime.Now;
             _unitOfWork.Commit();
 

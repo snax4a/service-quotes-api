@@ -16,6 +16,8 @@ namespace ServiceQuotes.Application.DTOs.Account
         [Compare("Password")]
         public string RepeatPassword { get; set; }
 
+        public byte[] Image { get; set; }
+
         [Required(ErrorMessage = "Role is required")]
         [EnumDataType(typeof(Role))]
         public Role Role { get; set; }
