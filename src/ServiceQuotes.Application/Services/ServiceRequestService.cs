@@ -133,6 +133,18 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.And(p => p.Status.Equals(filter.Status));
             }
 
+            var Id = new Guid();
+
+            if (!string.IsNullOrEmpty(filter?.EmployeeId) && Guid.TryParse(filter?.EmployeeId, out Id))
+            {
+                predicate = predicate.And(sr => sr.ServiceRequestEmployees.Any(sre => sre.EmployeeId == Id));
+            };
+
+            if (!string.IsNullOrEmpty(filter?.CustomerId) && Guid.TryParse(filter?.CustomerId, out Id))
+            {
+                predicate = predicate.And(sr => sr.CustomerId == Id);
+            };
+
             var serviceRequests = await _unitOfWork.ServiceRequests
                                         .FindWithCustomerAndAddressAndEmployees(predicate);
 
