@@ -15,12 +15,5 @@ namespace ServiceQuotes.Infrastructure.Repositories
         {
             return await _entities.SingleOrDefaultAsync(a => a.Email == email);
         }
-
-        public async Task<Account> GetByRefreshToken(string token)
-        {
-            return await _entities
-                        .Include(a => a.RefreshTokens)
-                        .SingleOrDefaultAsync(a => a.RefreshTokens.Any(t => t.Token == token));
-        }
     }
 }

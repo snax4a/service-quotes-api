@@ -12,6 +12,7 @@ using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -247,15 +248,18 @@ namespace ServiceQuotes.Application.Services
 
         public async Task<AuthenticatedAccountResponse> RefreshToken(string token, string ipAddress)
         {
-            var (refreshToken, account) = await getRefreshToken(token);
+            var refreshToken = await getRefreshToken(token);
+            var account = await _unitOfWork.Accounts.Get(refreshToken.AccountId);
 
             // replace old refresh token with a new one and save
             var newRefreshToken = generateRefreshToken(ipAddress);
-            refreshToken.Revoked = DateTime.UtcNow;
-            refreshToken.RevokedByIp = ipAddress;
-            refreshToken.ReplacedByToken = newRefreshToken.Token;
             account.RefreshTokens.Add(newRefreshToken);
 
+            refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = IPAddress.Parse(ipAddress);
+            refreshToken.ReplacedByToken = newRefreshToken.Token;
+
+            _unitOfWork.RefreshTokens.Add(newRefreshToken);
             _unitOfWork.Commit();
 
             // generate new jwt
@@ -267,23 +271,29 @@ namespace ServiceQuotes.Application.Services
             return response;
         }
 
+        public async Task<bool> DoesAccountOwnToken(Guid accountId, string token)
+        {
+            var account = await _unitOfWork.RefreshTokens.GetByToken(token);
+            return accountId == account.Id;
+        }
+
         public async Task RevokeToken(string token, string ipAddress)
         {
-            var (refreshToken, account) = await getRefreshToken(token);
+            var refreshToken = await getRefreshToken(token);
 
             // revoke token and save
             refreshToken.Revoked = DateTime.UtcNow;
-            refreshToken.RevokedByIp = ipAddress;
+            refreshToken.RevokedByIp = IPAddress.Parse(ipAddress);
             await _unitOfWork.CommitAsync();
         }
 
-        private async Task<(RefreshToken, Account)> getRefreshToken(string token)
+        private async Task<RefreshToken> getRefreshToken(string token)
         {
-            var account = await _unitOfWork.Accounts.GetByRefreshToken(token);
-            if (account is null) throw new AppException("Invalid token");
-            var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
-            if (!refreshToken.IsActive) throw new AppException("Invalid token");
-            return (refreshToken, account);
+            var refreshToken = await _unitOfWork.RefreshTokens.GetByToken(token);
+            if (refreshToken is null || !refreshToken.IsActive)
+                throw new AppException("Invalid token");
+
+            return refreshToken;
         }
 
         private RefreshToken generateRefreshToken(string ipAddress)
@@ -293,7 +303,7 @@ namespace ServiceQuotes.Application.Services
                 Token = randomTokenString(),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Created = DateTime.UtcNow,
-                CreatedByIp = ipAddress
+                CreatedByIp = IPAddress.Parse(ipAddress)
             };
         }
 

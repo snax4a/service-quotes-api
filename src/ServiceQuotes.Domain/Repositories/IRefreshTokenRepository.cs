@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace ServiceQuotes.Domain.Repositories
 {
-    public interface IAccountRepository : IRepository<Account>
+    public interface IRefreshTokenRepository : IRepository<RefreshToken>
     {
-        Task<Account> GetByEmail(string email);
+        Task<RefreshToken> GetByToken(string token);
     }
 }

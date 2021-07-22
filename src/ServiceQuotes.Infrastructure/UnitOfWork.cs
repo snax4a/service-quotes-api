@@ -11,6 +11,7 @@ namespace ServiceQuotes.Infrastructure
     {
         private readonly AppDbContext _context;
         private readonly Lazy<IAccountRepository> _accountRepository;
+        private readonly Lazy<IRefreshTokenRepository> _refreshTokenRepository;
         private readonly Lazy<ICustomerRepository> _customerRepository;
         private readonly Lazy<IAddressRepository> _addressRepository;
         private readonly Lazy<ICustomerAddressRepository> _customerAddressRepository;
@@ -28,6 +29,7 @@ namespace ServiceQuotes.Infrastructure
         {
             _context = context;
             _accountRepository = new Lazy<IAccountRepository>(() => new AccountRepository(context));
+            _refreshTokenRepository = new Lazy<IRefreshTokenRepository>(() => new RefreshTokenRepository(context));
             _customerRepository = new Lazy<ICustomerRepository>(() => new CustomerRepository(context));
             _addressRepository = new Lazy<IAddressRepository>(() => new AddressRepository(context));
             _customerAddressRepository = new Lazy<ICustomerAddressRepository>(() => new CustomerAddressRepository(context));
@@ -45,6 +47,11 @@ namespace ServiceQuotes.Infrastructure
         public IAccountRepository Accounts
         {
             get { return _accountRepository.Value; }
+        }
+
+        public IRefreshTokenRepository RefreshTokens
+        {
+            get { return _refreshTokenRepository.Value; }
         }
 
         public ICustomerRepository Customers

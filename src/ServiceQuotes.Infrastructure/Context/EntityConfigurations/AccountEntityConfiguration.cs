@@ -10,6 +10,20 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {
+            builder.HasKey(a => a.Id);
+
+            builder.Property(a => a.Id).ValueGeneratedOnAdd().IsRequired();
+
+            builder.Property(a => a.Email).HasMaxLength(50).IsRequired();
+
+            builder.Property(a => a.PasswordHash).HasMaxLength(150).IsRequired();
+
+            builder.Property(a => a.Image).IsRequired(false);
+
+            builder.Property(a => a.Created).IsRequired();
+
+            builder.Property(a => a.Updated).IsRequired(false);
+
             builder.HasData(
                 new Account
                 {
