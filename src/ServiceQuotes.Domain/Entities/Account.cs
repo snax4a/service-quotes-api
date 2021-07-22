@@ -8,6 +8,11 @@ namespace ServiceQuotes.Domain.Entities
 {
     public class Account : Entity
     {
+        public Account()
+        {
+            RefreshTokens = new HashSet<RefreshToken>();
+        }
+
         [Required]
         public string Email { get; set; }
 
@@ -17,11 +22,7 @@ namespace ServiceQuotes.Domain.Entities
         public byte[] Image { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
-        public List<RefreshToken> RefreshTokens { get; set; }
 
-        public bool OwnsToken(string token)
-        {
-            return this.RefreshTokens?.Find(x => x.Token == token) != null;
-        }
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }

@@ -12,6 +12,7 @@ using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -252,7 +253,7 @@ namespace ServiceQuotes.Application.Services
             // replace old refresh token with a new one and save
             var newRefreshToken = generateRefreshToken(ipAddress);
             refreshToken.Revoked = DateTime.UtcNow;
-            refreshToken.RevokedByIp = ipAddress;
+            refreshToken.RevokedByIp = IPAddress.Parse(ipAddress);
             refreshToken.ReplacedByToken = newRefreshToken.Token;
             account.RefreshTokens.Add(newRefreshToken);
 
@@ -273,7 +274,7 @@ namespace ServiceQuotes.Application.Services
 
             // revoke token and save
             refreshToken.Revoked = DateTime.UtcNow;
-            refreshToken.RevokedByIp = ipAddress;
+            refreshToken.RevokedByIp = IPAddress.Parse(ipAddress);
             await _unitOfWork.CommitAsync();
         }
 
@@ -293,7 +294,7 @@ namespace ServiceQuotes.Application.Services
                 Token = randomTokenString(),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Created = DateTime.UtcNow,
-                CreatedByIp = ipAddress
+                CreatedByIp = IPAddress.Parse(ipAddress)
             };
         }
 

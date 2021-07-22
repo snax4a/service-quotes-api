@@ -9,6 +9,7 @@ namespace ServiceQuotes.Infrastructure.Context
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerAddress> CustomerAddresses { get; set; }
@@ -31,6 +32,7 @@ namespace ServiceQuotes.Infrastructure.Context
             // todo fix/add account,customers,addresses configurations
             // custom entities configuration
             modelBuilder.ApplyConfiguration<Account>(new AccountEntityConfiguration());
+            modelBuilder.ApplyConfiguration<RefreshToken>(new RefreshTokenEntityConfiguration());
             modelBuilder.ApplyConfiguration<CustomerAddress>(new CustomerAddressEntityConfiguration());
             modelBuilder.ApplyConfiguration<Employee>(new EmployeeEntityConfiguration());
             modelBuilder.ApplyConfiguration<Specialization>(new SpecializationEntityConfiguration());
