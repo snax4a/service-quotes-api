@@ -7,6 +7,7 @@ namespace ServiceQuotes.Domain
     public interface IUnitOfWork : IDisposable
     {
         IAccountRepository Accounts { get; }
+        IRefreshTokenRepository RefreshTokens { get; }
         ICustomerRepository Customers { get; }
         IAddressRepository Addresses { get; }
         ICustomerAddressRepository CustomerAddresses { get; }

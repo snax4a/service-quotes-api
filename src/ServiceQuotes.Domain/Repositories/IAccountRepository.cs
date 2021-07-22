@@ -6,6 +6,5 @@ namespace ServiceQuotes.Domain.Repositories
     public interface IAccountRepository : IRepository<Account>
     {
         Task<Account> GetByEmail(string email);
-        Task<Account> GetByRefreshToken(string token);
     }
 }

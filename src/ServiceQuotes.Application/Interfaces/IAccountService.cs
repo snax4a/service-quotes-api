@@ -12,6 +12,8 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<AuthenticatedAccountResponse> RefreshToken(string token, string ipAddress);
 
+        Task<bool> DoesAccountOwnToken(Guid accountId, string token);
+
         Task RevokeToken(string token, string ipAddress);
 
         Task<List<GetAccountResponse>> GetAllAccounts(GetAccountsFilter filter);

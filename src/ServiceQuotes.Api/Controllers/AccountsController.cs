@@ -60,9 +60,11 @@ namespace ServiceQuotes.Api.Controllers
                 return BadRequest(new { message = "Token is required" });
 
             // users can revoke their own tokens and Managers can revoke any tokens
-            // TODO - fix this
-            // if (!Account.OwnsToken(token) && Account.Role != Role.Manager)
-            //     return Unauthorized(new { message = "Unauthorized" });
+            if (Account.Role != Role.Manager)
+            {
+                if (!(await _accountService.DoesAccountOwnToken(Account.Id, token)))
+                    return Unauthorized(new { message = "Unauthorized" });
+            }
 
             await _accountService.RevokeToken(token, ipAddress());
             return Ok(new { message = "Token revoked" });
