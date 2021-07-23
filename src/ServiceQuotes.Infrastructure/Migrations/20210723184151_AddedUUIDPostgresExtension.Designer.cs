@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ServiceQuotes.Infrastructure.Context;
@@ -10,9 +11,10 @@ using ServiceQuotes.Infrastructure.Context;
 namespace ServiceQuotes.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210723184151_AddedUUIDPostgresExtension")]
+    partial class AddedUUIDPostgresExtension
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,9 +295,7 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         .HasDefaultValueSql("NOW()");
 
                     b.Property<int>("ReferenceNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("ServiceRequestId")
                         .HasColumnType("uuid");
@@ -308,9 +308,6 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         .HasColumnType("numeric(7,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReferenceNumber")
-                        .IsUnique();
 
                     b.HasIndex("ServiceRequestId")
                         .IsUnique();
