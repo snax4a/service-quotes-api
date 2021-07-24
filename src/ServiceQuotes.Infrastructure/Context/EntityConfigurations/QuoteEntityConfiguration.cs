@@ -10,15 +10,17 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
         {
             builder.HasKey(quote => quote.Id);
 
-            builder.Property(quote => quote.Id).ValueGeneratedOnAdd().IsRequired();
+            builder.Property(quote => quote.Id).HasDefaultValueSql("uuid_generate_v4()").IsRequired();
 
-            builder.Property(quote => quote.ReferenceNumber).IsRequired();
+            builder.Property(quote => quote.ReferenceNumber).ValueGeneratedOnAdd().IsRequired();
 
             builder.Property(quote => quote.Total).HasPrecision(7, 2).IsRequired();
 
             builder.Property(quote => quote.Created).HasDefaultValueSql("NOW()").IsRequired();
 
             builder.HasOne(quote => quote.ServiceRequest).WithOne().HasForeignKey<Quote>("ServiceRequestId").IsRequired();
+
+            builder.HasIndex(quote => quote.ReferenceNumber).IsUnique();
         }
     }
 }
