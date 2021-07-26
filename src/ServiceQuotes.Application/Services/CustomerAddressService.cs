@@ -45,6 +45,11 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<List<GetCustomerAddressResponse>>(customerAddresses);
         }
 
+        public async Task<List<String>> GetCities(Guid customerId)
+        {
+            return await _unitOfWork.CustomerAddresses.GetCities(customerId);
+        }
+
         public void Dispose()
         {
             Dispose(true);

@@ -9,5 +9,7 @@ namespace ServiceQuotes.Application.Interfaces
     public interface ICustomerAddressService : IDisposable
     {
         Task<List<GetCustomerAddressResponse>> GetCustomerAddresses(Guid customerId, GetCustomerAddressFilter filter);
+
+        Task<List<String>> GetCities(Guid customerId);
     }
 }

@@ -11,5 +11,6 @@ namespace ServiceQuotes.Domain.Repositories
         Task<CustomerAddress> GetWithCustomerAndAddress(Guid customerId, Guid addressId);
         Task<CustomerAddress> GetByCustomerIdAndName(Guid customerId, string name);
         Task<IEnumerable<CustomerAddress>> FindWithAddress(Guid customerId, Expression<Func<CustomerAddress, bool>> predicate);
+        Task<List<String>> GetCities(Guid customerId);
     }
 }

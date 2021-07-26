@@ -39,5 +39,16 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Where(predicate)
                         .ToListAsync();
         }
+
+        public async Task<List<String>> GetCities(Guid customerId)
+        {
+            return await _entities
+                        .Include(ca => ca.Address)
+                        .Where(ca => ca.CustomerId == customerId)
+                        .Select(ca => ca.Address.City)
+                        .Distinct()
+                        .OrderBy(s => s)
+                        .ToListAsync();
+        }
     }
 }
