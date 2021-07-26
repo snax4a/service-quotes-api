@@ -40,6 +40,8 @@ namespace ServiceQuotes.Api
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+            services.AddScoped<ICustomerAddressService, CustomerAddressService>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();

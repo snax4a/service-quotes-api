@@ -1,5 +1,7 @@
 ﻿using ServiceQuotes.Domain.Entities;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Domain.Repositories
@@ -8,5 +10,6 @@ namespace ServiceQuotes.Domain.Repositories
     {
         Task<CustomerAddress> GetWithCustomerAndAddress(Guid customerId, Guid addressId);
         Task<CustomerAddress> GetByCustomerIdAndName(Guid customerId, string name);
+        Task<IEnumerable<CustomerAddress>> FindWithAddress(Guid customerId, Expression<Func<CustomerAddress, bool>> predicate);
     }
 }
