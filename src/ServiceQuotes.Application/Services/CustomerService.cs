@@ -111,6 +111,33 @@ namespace ServiceQuotes.Application.Services
             return await GetAddressById(customerId, address.Id);
         }
 
+        public async Task<GetCustomerAddressWithCustomerResponse> UpdateAddress(Guid customerId, Guid addressId, UpdateAddressRequest dto)
+        {
+            var customerAddress = await _unitOfWork.CustomerAddresses.GetWithCustomerAndAddress(customerId, addressId);
+
+            // validate
+            if (customerAddress is null) throw new KeyNotFoundException();
+
+            if (!string.IsNullOrEmpty(dto.Name) && customerAddress.Name != dto.Name)
+                customerAddress.Name = dto.Name;
+
+            if (!string.IsNullOrEmpty(dto.Street) && customerAddress.Address.Street != dto.Street)
+                customerAddress.Address.Street = dto.Street;
+
+            if (!string.IsNullOrEmpty(dto.City) && customerAddress.Address.City != dto.City)
+                customerAddress.Address.City = dto.City;
+
+            if (!string.IsNullOrEmpty(dto.ZipCode) && customerAddress.Address.ZipCode != dto.ZipCode)
+                customerAddress.Address.ZipCode = dto.ZipCode;
+
+            if (!string.IsNullOrEmpty(dto.PhoneNumber) && customerAddress.Address.PhoneNumber != dto.PhoneNumber)
+                customerAddress.Address.PhoneNumber = dto.PhoneNumber;
+
+            _unitOfWork.Commit();
+
+            return _mapper.Map<GetCustomerAddressWithCustomerResponse>(customerAddress);
+        }
+
         public async Task DeleteAddress(Guid customerId, Guid addressId)
         {
             var customerAddress = await _unitOfWork.CustomerAddresses.Get(customerId, addressId);
