@@ -141,9 +141,13 @@ namespace ServiceQuotes.Application.Services
         public async Task DeleteAddress(Guid customerId, Guid addressId)
         {
             var customerAddress = await _unitOfWork.CustomerAddresses.Get(customerId, addressId);
+            var address = await _unitOfWork.Addresses.Get(addressId);
+
             if (customerAddress is null) throw new KeyNotFoundException();
+            if (address is null) throw new KeyNotFoundException();
 
             _unitOfWork.CustomerAddresses.Remove(customerAddress);
+            _unitOfWork.Addresses.Remove(address);
             _unitOfWork.Commit();
         }
 

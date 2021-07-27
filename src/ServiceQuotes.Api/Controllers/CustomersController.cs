@@ -111,6 +111,17 @@ namespace ServiceQuotes.Api.Controllers
             }, customerAddress);
         }
 
+        [Authorize(Role.Manager)]
+        [HttpDelete("{customerId:guid}/address/{addressId:guid}")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> DeleteAddress(Guid customerId, Guid addressId)
+        {
+            await _customerService.DeleteAddress(customerId, addressId);
+            return NoContent();
+        }
+
         [Authorize(Role.Manager, Role.Customer)]
         [HttpPut("{customerId:guid}/address/{addressId:guid}")]
         [ProducesResponseType(201)]
