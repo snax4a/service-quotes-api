@@ -111,17 +111,6 @@ namespace ServiceQuotes.Api.Controllers
             }, customerAddress);
         }
 
-        [Authorize(Role.Manager)]
-        [HttpDelete("{customerId:guid}/address/{addressId:guid}")]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult> DeleteAddress(Guid customerId, Guid addressId)
-        {
-            await _customerService.DeleteAddress(customerId, addressId);
-            return NoContent();
-        }
-
         [Authorize(Role.Manager, Role.Customer)]
         [HttpPut("{customerId:guid}/address/{addressId:guid}")]
         [ProducesResponseType(201)]
@@ -139,6 +128,25 @@ namespace ServiceQuotes.Api.Controllers
 
             await _customerService.UpdateAddress(customerId, addressId, dto);
 
+            return NoContent();
+        }
+
+        [Authorize(Role.Customer, Role.Manager)]
+        [HttpDelete("{customerId:guid}/address/{addressId:guid}")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> DeleteAddress(Guid customerId, Guid addressId)
+        {
+            var customerAddress = await _customerService.GetAddressById(customerId, addressId);
+
+            // validate
+            if (customerAddress is null)
+                return NotFound(new { message = "Customer's address does not exist" });
+            if (customerAddress.Customer.AccountId != Account.Id && Account.Role != Role.Manager)
+                return Unauthorized(new { message = "Unauthorized" });
+
+            await _customerService.DeleteAddress(customerId, addressId);
             return NoContent();
         }
     }
