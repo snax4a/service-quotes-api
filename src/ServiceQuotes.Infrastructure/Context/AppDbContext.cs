@@ -29,6 +29,8 @@ namespace ServiceQuotes.Infrastructure.Context
                 throw new System.ArgumentNullException(nameof(modelBuilder));
             }
 
+            modelBuilder.HasPostgresExtension("uuid-ossp");
+
             // todo fix/add account,customers,addresses configurations
             // custom entities configuration
             modelBuilder.ApplyConfiguration<Account>(new AccountEntityConfiguration());
