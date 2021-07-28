@@ -31,8 +31,6 @@ namespace ServiceQuotes.Infrastructure.Context
 
             modelBuilder.HasPostgresExtension("uuid-ossp");
 
-            // todo fix/add account,customers,addresses configurations
-            // custom entities configuration
             modelBuilder.ApplyConfiguration<Account>(new AccountEntityConfiguration());
             modelBuilder.ApplyConfiguration<RefreshToken>(new RefreshTokenEntityConfiguration());
             modelBuilder.ApplyConfiguration<CustomerAddress>(new CustomerAddressEntityConfiguration());
