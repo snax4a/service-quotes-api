@@ -10,7 +10,7 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
         {
             builder.HasKey(payment => payment.Id);
 
-            builder.Property(payment => payment.Id).HasDefaultValueSql("uuid_generate_v4()").IsRequired();
+            builder.Property(payment => payment.Id).ValueGeneratedOnAdd().IsRequired();
 
             builder.Property(payment => payment.Provider).HasMaxLength(50).IsRequired();
 

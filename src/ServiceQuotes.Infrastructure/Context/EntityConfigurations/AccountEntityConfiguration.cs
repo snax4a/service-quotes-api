@@ -12,7 +12,7 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
         {
             builder.HasKey(a => a.Id);
 
-            builder.Property(a => a.Id).HasDefaultValueSql("uuid_generate_v4()").IsRequired();
+            builder.Property(a => a.Id).ValueGeneratedOnAdd().IsRequired();
 
             builder.Property(a => a.Email).HasMaxLength(50).IsRequired();
 
