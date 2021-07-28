@@ -12,10 +12,6 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<GetPaymentResponse> GetPaymentById(Guid id);
 
-        Task<GetPaymentResponse> CreatePayment(CreatePaymentRequest dto);
-
-        Task<GetPaymentResponse> UpdatePaymentStatus(Guid id, UpdatePaymentStatusRequest dto);
-
         Task<List<GetPaymentResponse>> GetPaymentsByCustomerId(Guid id);
 
         Task<List<GetPaymentResponse>> GetPaymentsByQuoteId(Guid id);

@@ -40,32 +40,6 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(payment);
         }
 
-        [Authorize(Role.Manager)]
-        [HttpPost]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(201)]
-        public async Task<ActionResult<GetPaymentResponse>> CreatePaymentRequest(Guid id, [FromBody] CreatePaymentRequest dto)
-        {
-            var newPayment = await _paymentService.CreatePayment(dto);
-            return CreatedAtAction("GetPaymentById", new { id = newPayment.Id }, newPayment);
-        }
-
-        [Authorize(Role.Manager)]
-        [HttpPut("{id:guid}/status")]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(204)]
-        public async Task<ActionResult<GetPaymentResponse>> UpdatePaymentStatus(Guid id, [FromBody] UpdatePaymentStatusRequest dto)
-        {
-            var payment = await _paymentService.GetPaymentById(id);
-
-            if (payment is null) return NotFound();
-
-            await _paymentService.UpdatePaymentStatus(id, dto);
-
-            return NoContent();
-        }
-
         [Authorize(Role.Manager, Role.Customer)]
         [HttpGet("customer/{id:guid}")]
         [ProducesResponseType(401)]
