@@ -39,7 +39,18 @@ namespace ServiceQuotes.Application.Services
 
             var payment = await _unitOfWork.Payments.Find(predicate);
 
-            return _mapper.Map<List<GetPaymentResponse>>(payment);
+            return payment.Select(p => new GetPaymentResponse()
+            {
+                Id = p.Id,
+                Provider = p.Provider,
+                Amount = p.Amount,
+                CutomerId = p.CustomerId,
+                Date = p.Date,
+                QuoteId = p.QuoteId,
+                TransactionId = p.TransactionId,
+                Status = p.Status.ToString(),
+            })
+            .ToList();
         }
 
         public async Task<GetPaymentResponse> GetPaymentById(Guid id)
