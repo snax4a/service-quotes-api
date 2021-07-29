@@ -1,4 +1,5 @@
 ﻿using ServiceQuotes.Application.DTOs.Payment;
+using ServiceQuotes.Application.DTOs.Paynow;
 using ServiceQuotes.Application.Filters;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,7 @@ namespace ServiceQuotes.Application.Interfaces
         Task<List<GetPaymentResponse>> GetPaymentsByCustomerId(Guid id);
 
         Task<List<GetPaymentResponse>> GetPaymentsByQuoteId(Guid id);
+
+        Task<PaynowPaymentResponse> CreatePaynowPayment(CreatePaynowPaymentRequest dto);
     }
 }

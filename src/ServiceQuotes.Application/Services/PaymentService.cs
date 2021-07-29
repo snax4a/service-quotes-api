@@ -1,15 +1,17 @@
 ﻿using AutoMapper;
 using LinqKit;
+using Microsoft.Extensions.Logging;
 using ServiceQuotes.Application.DTOs.Payment;
+using ServiceQuotes.Application.DTOs.Paynow;
 using ServiceQuotes.Application.Exceptions;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Entities;
-using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Application.Services
@@ -17,12 +19,20 @@ namespace ServiceQuotes.Application.Services
     public class PaymentService : IPaymentService
     {
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public PaymentService(IMapper mapper, IUnitOfWork unitOfWork)
+        public PaymentService(
+            IMapper mapper,
+            IUnitOfWork unitOfWork,
+            ILogger<PaymentService> logger,
+            IHttpClientFactory clientFactory)
         {
             _mapper = mapper;
+            _logger = logger;
             _unitOfWork = unitOfWork;
+            _clientFactory = clientFactory;
         }
 
         public async Task<List<GetPaymentResponse>> GetAllPayments(GetPaymentsFilter filter)
@@ -55,6 +65,25 @@ namespace ServiceQuotes.Application.Services
         public async Task<List<GetPaymentResponse>> GetPaymentsByQuoteId(Guid id)
         {
             return _mapper.Map<List<GetPaymentResponse>>(await _unitOfWork.Payments.Find(p => p.QuoteId.Equals(id)));
+        }
+
+        public async Task<PaynowPaymentResponse> CreatePaynowPayment(CreatePaynowPaymentRequest dto)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "repos/dotnet/AspNetCore.Docs/pulls");
+
+            var client = _clientFactory.CreateClient("paynow");
+
+            var response = await client.SendAsync(request);
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await JsonSerializer.DeserializeAsync<PaynowErrorResponse>(responseStream);
+                _logger.LogError("Create PayNow payment error", errorResponse);
+                throw new AppException("Creating payment was not successfull.");
+            }
+
+            return await JsonSerializer.DeserializeAsync<PaynowPaymentResponse>(responseStream);
         }
 
         public void Dispose()
