@@ -44,7 +44,7 @@ namespace ServiceQuotes.Application.Services
                 Id = p.Id,
                 Provider = p.Provider,
                 Amount = p.Amount,
-                CutomerId = p.CustomerId,
+                CustomerId = p.CustomerId,
                 Date = p.Date,
                 QuoteId = p.QuoteId,
                 TransactionId = p.TransactionId,

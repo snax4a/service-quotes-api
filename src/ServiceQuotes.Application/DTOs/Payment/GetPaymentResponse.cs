@@ -11,7 +11,7 @@ namespace ServiceQuotes.Application.DTOs.Payment
         public decimal Amount { get; set; }
         public string Status { get; set; }
         public Guid QuoteId { get; set; }
-        public Guid CutomerId { get; set; }
+        public Guid CustomerId { get; set; }
         public DateTime Date { get; set; }
     }
 }
