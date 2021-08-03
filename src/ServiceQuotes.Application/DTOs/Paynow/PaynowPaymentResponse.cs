@@ -6,6 +6,6 @@ namespace ServiceQuotes.Application.DTOs.Paynow
     {
         public string RedirectUrl { get; set; }
         public string PaymentId { get; set; }
-        public Status Status { get; set; }
+        public string Status { get; set; }
     }
 }

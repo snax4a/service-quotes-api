@@ -14,9 +14,13 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
 
             builder.Property(payment => payment.Provider).HasMaxLength(50).IsRequired();
 
-            builder.Property(payment => payment.TransactionId).HasMaxLength(150).IsRequired();
+            builder.Property(payment => payment.TransactionId).HasMaxLength(150).IsRequired(false);
 
             builder.Property(payment => payment.Amount).HasPrecision(7, 2).IsRequired();
+
+            builder.Property(payment => payment.Created).IsRequired();
+
+            builder.Property(payment => payment.Updated).IsRequired(false);
 
             builder
                 .HasOne(payment => payment.Quote)

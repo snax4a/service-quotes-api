@@ -3,6 +3,7 @@ using ServiceQuotes.Application.DTOs.Paynow;
 using ServiceQuotes.Application.Filters;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Application.Interfaces
@@ -17,6 +18,8 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<List<GetPaymentResponse>> GetPaymentsByQuoteId(Guid id);
 
-        Task<PaynowPaymentResponse> CreatePaynowPayment(CreatePaynowPaymentRequest dto);
+        Task<GetPaymentResponse> GetPaymentForQuote(Guid quoteId);
+
+        Task<CreatePaymentResponse> CreatePaymentForQuote(CreatePaymentRequest dto, Guid accountId);
     }
 }

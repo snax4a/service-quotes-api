@@ -45,7 +45,7 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<List<GetPaymentResponse>>> GetEmployeeByCustomerId(Guid id)
+        public async Task<ActionResult<List<GetPaymentResponse>>> GetPaymentsByCustomerId(Guid id)
         {
             var payment = await _paymentService.GetPaymentsByCustomerId(id);
 
@@ -59,13 +59,24 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<List<GetPaymentResponse>>> GetEmployeeByQuoteId(Guid id)
+        public async Task<ActionResult<List<GetPaymentResponse>>> GetPaymentsByQuoteId(Guid id)
         {
             var payment = await _paymentService.GetPaymentsByQuoteId(id);
 
             if (payment is null) return NotFound();
 
             return Ok(payment);
+        }
+
+        [Authorize(Role.Customer)]
+        [HttpPost()]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(201)]
+        public async Task<ActionResult<GetPaymentResponse>> CreatePayment([FromBody] CreatePaymentRequest dto)
+        {
+            var response = await _paymentService.CreatePaymentForQuote(dto, Account.Id);
+            return CreatedAtAction("GetPaymentById", new { id = response.Payment.Id }, response);
         }
     }
 }
