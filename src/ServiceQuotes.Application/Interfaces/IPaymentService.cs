@@ -21,5 +21,7 @@ namespace ServiceQuotes.Application.Interfaces
         Task<GetPaymentResponse> GetPaymentForQuote(Guid quoteId);
 
         Task<CreatePaymentResponse> CreatePaymentForQuote(CreatePaymentRequest dto, Guid accountId);
+
+        Task<bool> ProcessPaynowNotification(PaynowNotificationRequest dto, string signature);
     }
 }

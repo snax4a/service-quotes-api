@@ -9,5 +9,9 @@ namespace ServiceQuotes.Domain.Entities.Enums
         Cancelled = 4,
         Unpaid = 5,
         Paid = 6,
+        Error = 7,
+        Pending = 8,
+        Rejected = 9,
+        Confirmed = 10
     }
 }

@@ -122,17 +122,20 @@ namespace ServiceQuotes.Application.Services
             return _mapper.Map<GetQuoteWithServiceDetailsResponse>(quotes);
         }
 
-        public async Task<GetQuoteResponse> UpdateQuoteStatus(Guid id, UpdateQuoteStatusRequest dto)
+        public async Task<GetQuoteResponse> UpdateQuoteStatus(Guid id, Status status)
         {
             var quote = await _unitOfWork.Quotes.Get(id);
 
             // validate
-            if (quote is null) throw new KeyNotFoundException();
+            if (quote is null)
+                throw new KeyNotFoundException("Quote does not exist.");
 
-            if (quote.Status != dto.Status)
-                quote.Status = dto.Status;
+            if (quote.Status != status)
+            {
+                quote.Status = status;
+                _unitOfWork.Commit();
+            }
 
-            _unitOfWork.Commit();
             return _mapper.Map<GetQuoteResponse>(quote);
         }
 

@@ -13,6 +13,7 @@ using ServiceQuotes.Domain.Entities;
 using ServiceQuotes.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -28,19 +29,22 @@ namespace ServiceQuotes.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpClientFactory _clientFactory;
         private readonly AppSettings _appSettings;
+        private readonly IQuoteService _quoteService;
 
         public PaymentService(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             ILogger<PaymentService> logger,
             IHttpClientFactory clientFactory,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings,
+            IQuoteService quoteService)
         {
             _mapper = mapper;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _clientFactory = clientFactory;
             _appSettings = appSettings.Value;
+            _quoteService = quoteService;
         }
 
         public async Task<List<GetPaymentResponse>> GetAllPayments(GetPaymentsFilter filter)
@@ -125,6 +129,43 @@ namespace ServiceQuotes.Application.Services
             };
         }
 
+        public async Task<bool> ProcessPaynowNotification(PaynowNotificationRequest dto, string signature)
+        {
+            // validate signature header
+            string serializedData = JsonSerializer.Serialize(dto);
+            string calculatedSignature = CalculatePaynowSignature(serializedData);
+
+            if (!String.Equals(signature, calculatedSignature))
+                throw new AppException("Calculated signature is not matching header signature");
+
+            var payment = await _unitOfWork.Payments.Get(Guid.Parse(dto.ExternalId));
+
+            if (payment is null)
+                throw new KeyNotFoundException("Payment not found.");
+
+            // convert string to Status enum type
+            Status parsedStatus = (Status)Enum.Parse(typeof(Status), dto.Status, true);
+
+            // update payment status
+            if (ShouldStatusBeUpdated(payment.Status, parsedStatus))
+            {
+                payment.Status = parsedStatus;
+                payment.Updated = DateTime.UtcNow;
+
+                // if payment is confirmed update quote status
+                if (payment.Status == Status.Confirmed)
+                {
+                    await _quoteService.UpdateQuoteStatus(payment.QuoteId, Status.Paid);
+                }
+
+                _unitOfWork.Commit();
+
+                return true;
+            }
+
+            return false;
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -166,8 +207,7 @@ namespace ServiceQuotes.Application.Services
 
             var data = JsonSerializer.Serialize(dto);
             var content = new StringContent(data, Encoding.UTF8, "application/json");
-            var encoder = new System.Text.UTF8Encoding();
-            var signature = Utilities.CalculateHMAC(encoder.GetBytes(_appSettings.PaynowApiSignatureKey), encoder.GetBytes(data));
+            var signature = CalculatePaynowSignature(data);
 
             client.DefaultRequestHeaders.Add("Signature", signature);
             client.DefaultRequestHeaders.Add("Idempotency-Key", dto.ExternalId.ToString());
@@ -182,6 +222,36 @@ namespace ServiceQuotes.Application.Services
             }
 
             return await response.Content.ReadFromJsonAsync<PaynowPaymentResponse>();
+        }
+
+        private string CalculatePaynowSignature(string data)
+        {
+            var encoder = new System.Text.UTF8Encoding();
+            return Utilities.CalculateHMAC(encoder.GetBytes(_appSettings.PaynowApiSignatureKey), encoder.GetBytes(data));
+        }
+
+        // paynow status notifications can come out of order
+        // so this method determines if payment status should be updated
+        // for example status New shouldn't be applied after Pending or Completed
+        private bool ShouldStatusBeUpdated(Status currentStatus, Status newStatus)
+        {
+            // array of available statuses filled in correct order
+            Status[] correctStatuses = new Status[5] {
+                Status.New, Status.Pending, Status.Rejected, Status.Error, Status.Confirmed
+            };
+
+            // check if newStatus has correct value
+            if (!correctStatuses.Contains(newStatus))
+                return false;
+
+            // get current and new status index in array
+            int currentIndex = Array.IndexOf(correctStatuses, currentStatus);
+            int newIndex = Array.IndexOf(correctStatuses, newStatus);
+
+            if (newIndex <= currentIndex)
+                return false;
+
+            return true;
         }
     }
 }

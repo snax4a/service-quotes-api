@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceQuotes.Api.Helpers;
 using ServiceQuotes.Application.DTOs.Payment;
+using ServiceQuotes.Application.DTOs.Paynow;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain.Entities.Enums;
@@ -69,7 +70,7 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Customer)]
-        [HttpPost()]
+        [HttpPost]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(201)]
@@ -77,6 +78,21 @@ namespace ServiceQuotes.Api.Controllers
         {
             var response = await _paymentService.CreatePaymentForQuote(dto, Account.Id);
             return CreatedAtAction("GetPaymentById", new { id = response.Payment.Id }, response);
+        }
+
+        [HttpPost("paynow/notification")]
+        [ProducesResponseType(202)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> PaynowNotification([FromBody] PaynowNotificationRequest dto)
+        {
+            if (Request.Headers.ContainsKey("Signature"))
+            {
+                var signatureHeader = Request.Headers["Signature"];
+                await _paymentService.ProcessPaynowNotification(dto, signatureHeader);
+                return Accepted();
+            }
+
+            return BadRequest();
         }
     }
 }
