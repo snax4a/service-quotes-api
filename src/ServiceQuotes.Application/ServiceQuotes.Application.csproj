@@ -12,6 +12,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ServiceQuotes.Domain\ServiceQuotes.Domain.csproj"/>
+    <ProjectReference Include="..\ServiceQuotes.Domain\ServiceQuotes.Domain.csproj" />
   </ItemGroup>
 </Project>

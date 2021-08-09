@@ -20,5 +20,9 @@ namespace ServiceQuotes.Application.Interfaces
         Task<GetCustomerAddressWithCustomerResponse> GetAddressById(Guid customerId, Guid addressId);
 
         Task<GetCustomerAddressWithCustomerResponse> CreateAddress(Guid customerId, CreateAddressRequest address);
+
+        Task DeleteAddress(Guid customerId, Guid addressId);
+
+        Task<GetCustomerAddressWithCustomerResponse> UpdateAddress(Guid customerId, Guid addressId, UpdateAddressRequest address);
     }
 }

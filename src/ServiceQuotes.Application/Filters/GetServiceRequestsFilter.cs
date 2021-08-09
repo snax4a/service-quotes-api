@@ -8,5 +8,7 @@ namespace ServiceQuotes.Application.Filters
         public string Description { get; set; }
         public string DateRange { get; set; }
         public Status? Status { get; set; }
+        public string EmployeeId { get; set; }
+        public string CustomerId { get; set; }
     }
 }
