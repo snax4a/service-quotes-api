@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using BC = BCrypt.Net.BCrypt;
 
@@ -66,6 +67,13 @@ namespace ServiceQuotes.Application.Helpers
                 return false;
             }
             return true;
+        }
+
+        public static string CalculateHMAC(byte[] key, byte[] data)
+        {
+            var hmacsha256 = new HMACSHA256(key);
+            byte[] hashmessage = hmacsha256.ComputeHash(data);
+            return Convert.ToBase64String(hashmessage);
         }
     }
 }

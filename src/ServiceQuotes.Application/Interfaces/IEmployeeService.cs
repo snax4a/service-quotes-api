@@ -8,9 +8,9 @@ namespace ServiceQuotes.Application.Interfaces
 {
     public interface IEmployeeService : IDisposable
     {
-        Task<List<GetEmployeeWithSpecializationsResponse>> GetAllEmployees(GetEmployeesFilter filter);
+        Task<List<GetEmployeeWithAccountImageResponse>> GetAllEmployees(GetEmployeesFilter filter);
 
-        Task<GetEmployeeWithSpecializationsResponse> GetEmployeeById(Guid id);
+        Task<GetEmployeeWithAccountImageResponse> GetEmployeeById(Guid id);
 
         Task<GetEmployeeResponse> CreateEmployee(CreateEmployeeRequest dto);
 

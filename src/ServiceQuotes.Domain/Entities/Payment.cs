@@ -1,7 +1,6 @@
 using ServiceQuotes.Domain.Entities.Abstractions;
 using ServiceQuotes.Domain.Entities.Enums;
 using System;
-using System.Collections.Generic;
 
 namespace ServiceQuotes.Domain.Entities
 {
@@ -13,7 +12,8 @@ namespace ServiceQuotes.Domain.Entities
         public Status Status { get; set; }
         public Guid QuoteId { get; set; }
         public Guid CustomerId { get; set; }
-        public virtual DateTime Date { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; }
 
         public virtual Quote Quote { get; set; }
         public virtual Customer Customer { get; set; }
