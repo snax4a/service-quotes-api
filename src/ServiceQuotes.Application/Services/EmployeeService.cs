@@ -25,7 +25,7 @@ namespace ServiceQuotes.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<GetEmployeeWithSpecializationsResponse>> GetAllEmployees(GetEmployeesFilter filter)
+        public async Task<List<GetEmployeeWithAccountImageResponse>> GetAllEmployees(GetEmployeesFilter filter)
         {
             // prepare filter predicate
             var predicate = PredicateBuilder.New<Employee>(true);
@@ -45,12 +45,13 @@ namespace ServiceQuotes.Application.Services
 
             var employees = await _unitOfWork.Employees.FindWithSpecializations(predicate);
 
-            return employees.Select(employee => new GetEmployeeWithSpecializationsResponse()
+            return employees.Select(employee => new GetEmployeeWithAccountImageResponse()
             {
                 Id = employee.Id,
                 AccountId = employee.AccountId,
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,
+                Image = employee.Account.Image,
                 Specializations = employee.EmployeeSpecializations
                     .Select(es => new GetSpecializationResponse()
                     {
@@ -62,16 +63,17 @@ namespace ServiceQuotes.Application.Services
             .ToList();
         }
 
-        public async Task<GetEmployeeWithSpecializationsResponse> GetEmployeeById(Guid id)
+        public async Task<GetEmployeeWithAccountImageResponse> GetEmployeeById(Guid id)
         {
             var employee = await _unitOfWork.Employees.GetWithSpecializations(id);
 
-            return new GetEmployeeWithSpecializationsResponse()
+            return new GetEmployeeWithAccountImageResponse()
             {
                 Id = employee.Id,
                 AccountId = employee.AccountId,
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,
+                Image = employee.Account.Image,
                 Specializations = employee.EmployeeSpecializations
                     .Select(es => new GetSpecializationResponse()
                     {

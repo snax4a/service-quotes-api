@@ -47,26 +47,73 @@ namespace ServiceQuotes.Application.Services
             _quoteService = quoteService;
         }
 
-        public async Task<List<GetPaymentResponse>> GetAllPayments(GetPaymentsFilter filter)
+        public async Task<List<GetPaymentResponse>> GetAllPayments(Account account, GetPaymentsFilter filter)
         {
             // prepare filter predicate
             var predicate = PredicateBuilder.New<Payment>(true);
 
             if (!string.IsNullOrEmpty(filter?.SearchString))
             {
-                predicate = predicate.Or(p => p.Provider.Equals(filter.SearchString.ToLower()));
-                predicate = predicate.Or(p => p.TransactionId.Equals(filter.SearchString.ToLower()));
-                predicate = predicate.Or(p => p.Status.Equals(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Provider.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.TransactionId.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Amount.ToString().ToLower().Contains(filter.SearchString.ToLower()));
             }
 
-            var payment = await _unitOfWork.Payments.Find(predicate);
+            if (account.Role == Role.Customer)
+            {
+                // customer can get only his own payments
+                var customer = await _unitOfWork.Customers.GetByAccountId(account.Id);
+                predicate = predicate.And(p => p.CustomerId == customer.Id);
+            }
+
+            if (!string.IsNullOrEmpty(filter?.DateRange))
+            {
+                switch (filter.DateRange)
+                {
+                    case "30-days":
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-30));
+                        break;
+                    case "7-days":
+                        predicate = predicate.And(p => p.Created >= DateTime.UtcNow.AddDays(-7));
+                        break;
+                    case "today":
+                        predicate = predicate.And(p => p.Created.Date == DateTime.UtcNow.Date);
+                        break;
+                }
+            }
+
+            if (filter.Status is not null)
+            {
+                predicate = predicate.And(p => p.Status.Equals(filter.Status));
+            }
+
+            var payment = await _unitOfWork.Payments.FindWithQuoteAndCustomer(predicate);
 
             return _mapper.Map<List<GetPaymentResponse>>(payment);
         }
 
         public async Task<GetPaymentResponse> GetPaymentById(Guid id)
         {
-            return _mapper.Map<GetPaymentResponse>(await _unitOfWork.Payments.Get(id));
+            var payment = await _unitOfWork.Payments.GetWithQuoteAndCustomer(id);
+
+            if (payment is null)
+                throw new KeyNotFoundException("Payment not found");
+
+            var paymentResponse = _mapper.Map<GetPaymentResponse>(payment);
+            paymentResponse.Customer.Image = payment.Customer.Account.Image;
+            return paymentResponse;
+        }
+
+        public async Task<GetPaymentResponse> GetPaymentByTransactionId(string id)
+        {
+            var payment = await _unitOfWork.Payments.GetWithQuoteAndCustomer(id);
+
+            if (payment is null)
+                throw new KeyNotFoundException("Payment not found");
+
+            var paymentResponse = _mapper.Map<GetPaymentResponse>(payment);
+            paymentResponse.Customer.Image = payment.Customer.Account.Image;
+            return paymentResponse;
         }
 
         public async Task<List<GetPaymentResponse>> GetPaymentsByCustomerId(Guid id)
@@ -236,8 +283,8 @@ namespace ServiceQuotes.Application.Services
         private bool ShouldStatusBeUpdated(Status currentStatus, Status newStatus)
         {
             // array of available statuses filled in correct order
-            Status[] correctStatuses = new Status[5] {
-                Status.New, Status.Pending, Status.Rejected, Status.Error, Status.Confirmed
+            Status[] correctStatuses = new Status[6] {
+                Status.New, Status.Pending, Status.Rejected, Status.Expired, Status.Error, Status.Confirmed
             };
 
             // check if newStatus has correct value

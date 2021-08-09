@@ -12,6 +12,7 @@ namespace ServiceQuotes.Domain.Entities.Enums
         Error = 7,
         Pending = 8,
         Rejected = 9,
-        Confirmed = 10
+        Confirmed = 10,
+        Expired = 11
     }
 }

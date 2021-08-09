@@ -1,4 +1,5 @@
-﻿using ServiceQuotes.Domain.Entities.Enums;
+﻿using ServiceQuotes.Application.DTOs.Customer;
+using ServiceQuotes.Application.DTOs.Quote;
 using System;
 
 namespace ServiceQuotes.Application.DTOs.Payment
@@ -14,5 +15,7 @@ namespace ServiceQuotes.Application.DTOs.Payment
         public Guid CustomerId { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
+        public GetQuoteResponse Quote { get; set; }
+        public GetCustomerWithImageResponse Customer { get; set; }
     }
 }

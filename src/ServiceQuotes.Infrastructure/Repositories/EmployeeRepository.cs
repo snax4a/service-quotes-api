@@ -17,17 +17,20 @@ namespace ServiceQuotes.Infrastructure.Repositories
         public async Task<Employee> GetWithSpecializations(Guid id)
         {
             return await _entities
+                        .Include(e => e.Account)
                         .Include(e => e.EmployeeSpecializations)
-                        .ThenInclude(es => es.Specialization)
+                            .ThenInclude(es => es.Specialization)
                         .SingleOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<Employee>> FindWithSpecializations(Expression<Func<Employee, bool>> predicate)
         {
             return await _entities
+                        .Include(e => e.Account)
                         .Include(e => e.EmployeeSpecializations)
                             .ThenInclude(es => es.Specialization)
                         .Where(predicate)
+                        .OrderBy(e => e.FirstName)
                         .ToListAsync();
         }
 

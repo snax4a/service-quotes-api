@@ -20,11 +20,11 @@ namespace ServiceQuotes.Api.Controllers
             _paymentService = paymentService;
         }
 
-        [Authorize(Role.Manager)]
+        [Authorize(Role.Manager, Role.Customer)]
         [HttpGet]
         public async Task<ActionResult<List<GetPaymentResponse>>> GetPayments([FromQuery] GetPaymentsFilter filter)
         {
-            return Ok(await _paymentService.GetAllPayments(filter));
+            return Ok(await _paymentService.GetAllPayments(Account, filter));
         }
 
         [Authorize(Role.Manager, Role.Customer)]
@@ -42,13 +42,13 @@ namespace ServiceQuotes.Api.Controllers
         }
 
         [Authorize(Role.Manager, Role.Customer)]
-        [HttpGet("customer/{id:guid}")]
+        [HttpGet("transaction/{transactionId}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<List<GetPaymentResponse>>> GetPaymentsByCustomerId(Guid id)
+        public async Task<ActionResult<GetPaymentResponse>> GetPaymentByTransactionId(string transactionId)
         {
-            var payment = await _paymentService.GetPaymentsByCustomerId(id);
+            var payment = await _paymentService.GetPaymentByTransactionId(transactionId);
 
             if (payment is null) return NotFound();
 
