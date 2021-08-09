@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceQuotes.Api.Helpers;
 using ServiceQuotes.Application.DTOs.Payment;
+using ServiceQuotes.Application.DTOs.Paynow;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain.Entities.Enums;
@@ -19,11 +20,11 @@ namespace ServiceQuotes.Api.Controllers
             _paymentService = paymentService;
         }
 
-        [Authorize(Role.Manager)]
+        [Authorize(Role.Manager, Role.Customer)]
         [HttpGet]
         public async Task<ActionResult<List<GetPaymentResponse>>> GetPayments([FromQuery] GetPaymentsFilter filter)
         {
-            return Ok(await _paymentService.GetAllPayments(filter));
+            return Ok(await _paymentService.GetAllPayments(Account, filter));
         }
 
         [Authorize(Role.Manager, Role.Customer)]
@@ -40,40 +41,14 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(payment);
         }
 
-        [Authorize(Role.Manager)]
-        [HttpPost]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(201)]
-        public async Task<ActionResult<GetPaymentResponse>> CreatePaymentRequest(Guid id, [FromBody] CreatePaymentRequest dto)
-        {
-            var newPayment = await _paymentService.CreatePayment(dto);
-            return CreatedAtAction("GetPaymentById", new { id = newPayment.Id }, newPayment);
-        }
-
-        [Authorize(Role.Manager)]
-        [HttpPut("{id:guid}/status")]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(204)]
-        public async Task<ActionResult<GetPaymentResponse>> UpdatePaymentStatus(Guid id, [FromBody] UpdatePaymentStatusRequest dto)
-        {
-            var payment = await _paymentService.GetPaymentById(id);
-
-            if (payment is null) return NotFound();
-
-            await _paymentService.UpdatePaymentStatus(id, dto);
-
-            return NoContent();
-        }
-
         [Authorize(Role.Manager, Role.Customer)]
-        [HttpGet("customer/{id:guid}")]
+        [HttpGet("transaction/{transactionId}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<List<GetPaymentResponse>>> GetEmployeeByCustomerId(Guid id)
+        public async Task<ActionResult<GetPaymentResponse>> GetPaymentByTransactionId(string transactionId)
         {
-            var payment = await _paymentService.GetPaymentsByCustomerId(id);
+            var payment = await _paymentService.GetPaymentByTransactionId(transactionId);
 
             if (payment is null) return NotFound();
 
@@ -85,13 +60,39 @@ namespace ServiceQuotes.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetPaymentResponse), 200)]
-        public async Task<ActionResult<List<GetPaymentResponse>>> GetEmployeeByQuoteId(Guid id)
+        public async Task<ActionResult<List<GetPaymentResponse>>> GetPaymentsByQuoteId(Guid id)
         {
             var payment = await _paymentService.GetPaymentsByQuoteId(id);
 
             if (payment is null) return NotFound();
 
             return Ok(payment);
+        }
+
+        [Authorize(Role.Customer)]
+        [HttpPost]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(201)]
+        public async Task<ActionResult<GetPaymentResponse>> CreatePayment([FromBody] CreatePaymentRequest dto)
+        {
+            var response = await _paymentService.CreatePaymentForQuote(dto, Account.Id);
+            return CreatedAtAction("GetPaymentById", new { id = response.Payment.Id }, response);
+        }
+
+        [HttpPost("paynow/notification")]
+        [ProducesResponseType(202)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> PaynowNotification([FromBody] PaynowNotificationRequest dto)
+        {
+            if (Request.Headers.ContainsKey("Signature"))
+            {
+                var signatureHeader = Request.Headers["Signature"];
+                await _paymentService.ProcessPaynowNotification(dto, signatureHeader);
+                return Accepted();
+            }
+
+            return BadRequest();
         }
     }
 }

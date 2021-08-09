@@ -10,7 +10,7 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
         {
             builder.HasKey(rt => rt.Id);
 
-            builder.Property(rt => rt.Id).HasDefaultValueSql("uuid_generate_v4()").IsRequired();
+            builder.Property(rt => rt.Id).ValueGeneratedOnAdd().IsRequired();
 
             builder.Property(rt => rt.Token).IsRequired();
 

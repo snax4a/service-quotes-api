@@ -73,8 +73,6 @@ namespace ServiceQuotes.Application.MappingProfiles
 
             // Payment Map
             CreateMap<Payment, GetPaymentResponse>().ReverseMap();
-            CreateMap<CreatePaymentRequest, Quote>();
-            CreateMap<UpdatePaymentStatusRequest, Quote>();
 
             // JobValuation Map
             CreateMap<JobValuation, GetJobValuationResponse>().ReverseMap();

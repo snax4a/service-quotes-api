@@ -9,6 +9,7 @@ using ServiceQuotes.Domain;
 using ServiceQuotes.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Application.Services
@@ -24,7 +25,7 @@ namespace ServiceQuotes.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<GetCustomerResponse>> GetAllCustomers(GetCustomersFilter filter)
+        public async Task<List<GetCustomerWithImageResponse>> GetAllCustomers(GetCustomersFilter filter)
         {
             // prepare filter predicate
             var predicate = PredicateBuilder.New<Customer>(true);
@@ -35,9 +36,17 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.Or(p => p.VatNumber.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
-            var customers = await _unitOfWork.Customers.Find(predicate);
+            var customers = await _unitOfWork.Customers.FindWithAccount(predicate);
 
-            return _mapper.Map<List<GetCustomerResponse>>(customers);
+            return customers.Select(customer => new GetCustomerWithImageResponse()
+            {
+                Id = customer.Id,
+                AccountId = customer.AccountId,
+                Image = customer.Account.Image,
+                CompanyName = customer.CompanyName,
+                VatNumber = customer.VatNumber,
+            })
+            .ToList();
         }
 
         public async Task<GetCustomerWithAddressesResponse> GetCustomerById(Guid id)

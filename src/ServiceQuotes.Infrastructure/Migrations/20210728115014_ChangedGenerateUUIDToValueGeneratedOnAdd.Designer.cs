@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ServiceQuotes.Infrastructure.Context;
@@ -10,9 +11,10 @@ using ServiceQuotes.Infrastructure.Context;
 namespace ServiceQuotes.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210728115014_ChangedGenerateUUIDToValueGeneratedOnAdd")]
+    partial class ChangedGenerateUUIDToValueGeneratedOnAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,11 +246,11 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Provider")
                         .IsRequired()
@@ -262,11 +264,9 @@ namespace ServiceQuotes.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("TransactionId")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 

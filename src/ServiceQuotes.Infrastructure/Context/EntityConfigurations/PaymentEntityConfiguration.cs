@@ -10,13 +10,17 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
         {
             builder.HasKey(payment => payment.Id);
 
-            builder.Property(payment => payment.Id).HasDefaultValueSql("uuid_generate_v4()").IsRequired();
+            builder.Property(payment => payment.Id).ValueGeneratedOnAdd().IsRequired();
 
             builder.Property(payment => payment.Provider).HasMaxLength(50).IsRequired();
 
-            builder.Property(payment => payment.TransactionId).HasMaxLength(150).IsRequired();
+            builder.Property(payment => payment.TransactionId).HasMaxLength(150).IsRequired(false);
 
             builder.Property(payment => payment.Amount).HasPrecision(7, 2).IsRequired();
+
+            builder.Property(payment => payment.Created).IsRequired();
+
+            builder.Property(payment => payment.Updated).IsRequired(false);
 
             builder
                 .HasOne(payment => payment.Quote)

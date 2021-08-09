@@ -30,10 +30,11 @@ namespace ServiceQuotes.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Extension method for less clutter in startup
+            // Extension method for less clutter in startup
             services.AddApplicationDbContext(Configuration, Environment);
+            services.AddPaynowHttpClient(Configuration);
 
-            //DI Services and Repos
+            // DI Services and Repos
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -54,7 +55,7 @@ namespace ServiceQuotes.Api
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IPaymentService, PaymentService>();
 
-            // configure strongly typed settings object
+            // Configure strongly typed settings object
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             // WebApi Configuration

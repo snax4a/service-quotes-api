@@ -73,7 +73,7 @@ namespace ServiceQuotes.Api.Controllers
 
             if (quote is null) return NotFound();
 
-            await _quoteService.UpdateQuoteStatus(id, dto);
+            await _quoteService.UpdateQuoteStatus(id, dto.Status);
 
             return NoContent();
         }
