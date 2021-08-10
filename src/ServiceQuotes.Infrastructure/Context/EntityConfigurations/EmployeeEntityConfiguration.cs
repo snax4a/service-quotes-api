@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ServiceQuotes.Domain.Entities;
+using System;
 
 namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
 {
@@ -19,6 +20,16 @@ namespace ServiceQuotes.Infrastructure.Context.EntityConfigurations
             builder.HasOne(employee => employee.Account).WithOne().HasForeignKey<Employee>("AccountId").IsRequired();
 
             builder.HasIndex("AccountId").IsUnique();
+
+            builder.HasData(
+                new Employee
+                {
+                    Id = new Guid("5e02401f-bf8c-4e2f-b4a8-a7e27cd3678d"),
+                    AccountId = new Guid("7542b6b8-638c-44c9-806b-0040667c32a9"),
+                    FirstName = "Szymon",
+                    LastName = "Sus"
+                }
+            );
         }
     }
 }
