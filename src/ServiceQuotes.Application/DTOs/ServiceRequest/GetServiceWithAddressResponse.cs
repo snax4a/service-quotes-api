@@ -4,6 +4,6 @@ namespace ServiceQuotes.Application.DTOs.ServiceRequest
 {
     public class GetServiceWithAddressResponse : GetServiceResponse
     {
-        public GetAddressResponse Address { get; set; }
+        public GetCustomerAddressResponse CustomerAddress { get; set; }
     }
 }

@@ -19,6 +19,8 @@ namespace ServiceQuotes.Application.Interfaces
 
         Task<List<GetServiceDetailsResponse>> GetServicesAssignedToEmployee(Guid employeeId);
 
+        Task<GetServiceDetailsResponse> GetServiceCurrentlyWorkingOn(Guid employeeId);
+
         Task<GetServiceResponse> CreateServiceRequest(CreateServiceRequest dto);
 
         Task<GetServiceResponse> UpdateServiceRequest(Guid id, UpdateServiceRequest dto);
@@ -32,6 +34,8 @@ namespace ServiceQuotes.Application.Interfaces
         Task RemoveMaterial(Guid materialId);
 
         Task<List<GetServiceRequestJobValuationResponse>> GetJobValuations(Guid serviceRequestId);
+
+        Task<List<GetServiceRequestJobValuationResponse>> GetLastEmployeeJobValuations(Guid employeeId, int count);
 
         Task<GetJobValuationResponse> AddJobValuation(Guid serviceRequestId, CreateJobValuationRequest dto);
 

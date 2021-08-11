@@ -12,5 +12,6 @@ namespace ServiceQuotes.Domain.Repositories
         Task<ServiceRequestJobValuation> GetByJobValuationId(Guid jobValuationId);
         Task<IEnumerable<ServiceRequestJobValuation>> GetAllByServiceRequestId(Guid serviceRequestId);
         Task<IEnumerable<ServiceRequestJobValuation>> GetAllByEmployeeId(Guid employeeId);
+        Task<IEnumerable<ServiceRequestJobValuation>> GetLastByEmployeeId(Guid employeeId, int amount);
     }
 }
