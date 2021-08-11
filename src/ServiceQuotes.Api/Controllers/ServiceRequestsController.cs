@@ -19,11 +19,16 @@ namespace ServiceQuotes.Api.Controllers
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly IServiceRequestService _serviceRequestService;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public ServiceRequestsController(ICustomerRepository customerRepository, IServiceRequestService serviceRequestService)
+        public ServiceRequestsController(
+            ICustomerRepository customerRepository,
+            IServiceRequestService serviceRequestService,
+            IEmployeeRepository employeeRepository)
         {
             _customerRepository = customerRepository;
             _serviceRequestService = serviceRequestService;
+            _employeeRepository = employeeRepository;
         }
 
         [Authorize]
@@ -65,18 +70,36 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(serviceRequest);
         }
 
-        [Authorize(Role.Manager)]
+        [Authorize(Role.Manager, Role.Employee)]
         [HttpGet("assigned/{employeeId:guid}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(GetServiceDetailsResponse), 200)]
         public async Task<ActionResult<GetServiceDetailsResponse>> GetServicesAssignedToEmployee(Guid employeeId)
         {
-            var serviceRequest = await _serviceRequestService.GetServicesAssignedToEmployee(employeeId);
+            var employee = await _employeeRepository.GetByAccountId(Account.Id);
 
-            if (serviceRequest is null) return NotFound();
+            // manager can get any employee services, employee can only get his own
+            if (employeeId != employee.Id)
+                return Unauthorized(new { message = "Unauthorized" });
 
-            return Ok(serviceRequest);
+            return Ok(await _serviceRequestService.GetServicesAssignedToEmployee(employeeId));
+        }
+
+        [Authorize(Role.Employee)]
+        [HttpGet("currently-working-on")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(GetServiceDetailsResponse), 200)]
+        public async Task<ActionResult<GetServiceDetailsResponse>> GetServiceCurrentlyWorkingOn()
+        {
+            var employee = await _employeeRepository.GetByAccountId(Account.Id);
+            var service = await _serviceRequestService.GetServiceCurrentlyWorkingOn(employee.Id);
+
+            if (service is null)
+                return NotFound();
+
+            return Ok(service);
         }
 
         [Authorize(Role.Manager, Role.Customer)]
@@ -180,6 +203,17 @@ namespace ServiceQuotes.Api.Controllers
         {
             return Ok(await _serviceRequestService.GetJobValuations(serviceRequestId));
         }
+
+        [Authorize(Role.Employee)]
+        [HttpGet("job-valuations/{count:int}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetServiceRequestJobValuationResponse>> GetLastEmployeeJobValuations(Guid serviceRequestId, [FromRoute] int count)
+        {
+            var employee = await _employeeRepository.GetByAccountId(Account.Id);
+            return Ok(await _serviceRequestService.GetLastEmployeeJobValuations(employee.Id, count));
+        }
+
 
         [Authorize(Role.Manager, Role.Employee)]
         [HttpPost("{serviceRequestId:guid}/job-valuations")]

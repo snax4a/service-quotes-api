@@ -85,7 +85,7 @@ namespace ServiceQuotes.Application.Services
                 CustomerId = sr.CustomerId,
                 AddressId = sr.AddressId,
                 Status = sr.Status.ToString(),
-                Address = _mapper.Map<GetAddressResponse>(sr.CustomerAddress.Address)
+                CustomerAddress = _mapper.Map<GetCustomerAddressResponse>(sr.CustomerAddress)
             })
             .ToList();
         }
@@ -249,6 +249,16 @@ namespace ServiceQuotes.Application.Services
                 CustomerAddress = _mapper.Map<GetCustomerAddressResponse>(sr.CustomerAddress),
             })
             .ToList();
+        }
+
+        public async Task<GetServiceDetailsResponse> GetServiceCurrentlyWorkingOn(Guid employeeId)
+        {
+            var predicate = PredicateBuilder.New<ServiceRequest>(true);
+            predicate = predicate.And(p => p.Status == Status.InProgress);
+            predicate = predicate.And(p => p.ServiceRequestEmployees.Any(sre => sre.EmployeeId == employeeId));
+
+            var serviceRequests = await _unitOfWork.ServiceRequests.FindWithCustomerAndAddressAndEmployees(predicate);
+            return _mapper.Map<GetServiceDetailsResponse>(serviceRequests.FirstOrDefault());
         }
 
         public async Task<GetServiceResponse> CreateServiceRequest(CreateServiceRequest dto)
@@ -418,6 +428,20 @@ namespace ServiceQuotes.Application.Services
                         })
                         .ToList(),
                 }
+            })
+            .ToList();
+        }
+
+         public async Task<List<GetServiceRequestJobValuationResponse>> GetLastEmployeeJobValuations(Guid employeeId, int count)
+        {
+            var jobValuations =
+                await _unitOfWork.ServiceRequestJobValuations.GetLastByEmployeeId(employeeId, count);
+
+            return jobValuations.Select(jv => new GetServiceRequestJobValuationResponse()
+            {
+                JobValuation = _mapper.Map<GetJobValuationResponse>(jv.JobValuation),
+                ServiceRequestId = jv.ServiceRequestId,
+                Date = jv.Date,
             })
             .ToList();
         }

@@ -5,6 +5,7 @@ using ServiceQuotes.Infrastructure.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ServiceQuotes.Infrastructure.Repositories
@@ -29,6 +30,16 @@ namespace ServiceQuotes.Infrastructure.Repositories
                         .Include(jv => jv.Employee)
                             .ThenInclude(e => e.Account)
                         .SingleOrDefaultAsync(jv => jv.EmployeeId == employeeId);
+        }
+
+        public async Task<IEnumerable<ServiceRequestJobValuation>> GetLastByEmployeeId(Guid employeeId, int count)
+        {
+            return await _entities
+                        .Include(srjv => srjv.JobValuation)
+                        .Where(srjv => srjv.EmployeeId == employeeId)
+                        .OrderByDescending(srjv => srjv.Date)
+                        .Take(count)
+                        .ToListAsync();
         }
 
         public async Task<ServiceRequestJobValuation> GetByJobValuationId(Guid jobValuationId)
