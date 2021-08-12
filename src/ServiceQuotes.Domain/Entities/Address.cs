@@ -22,7 +22,7 @@ namespace ServiceQuotes.Domain.Entities
         public string ZipCode { get; set; }
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(100)]
         public string Street { get; set; }
 
         [Phone]
