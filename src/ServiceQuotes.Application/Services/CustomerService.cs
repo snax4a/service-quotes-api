@@ -52,7 +52,14 @@ namespace ServiceQuotes.Application.Services
         public async Task<GetCustomerWithAddressesResponse> GetCustomerById(Guid id)
         {
             var customer = await _unitOfWork.Customers.GetWithAddresses(id);
-            return _mapper.Map<GetCustomerWithAddressesResponse>(customer);
+
+            if (customer is null)
+                throw new KeyNotFoundException("Customer does not exist.");
+
+            var response = _mapper.Map<GetCustomerWithAddressesResponse>(customer);
+            response.Image = customer.Account.Image;
+
+            return response;
         }
 
         public async Task<GetCustomerResponse> CreateCustomer(CreateCustomerRequest dto)
