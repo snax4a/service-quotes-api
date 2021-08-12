@@ -335,6 +335,8 @@ namespace ServiceQuotes.Application.Services
                 case Status.Completed:
                     if (serviceRequest.Status != Status.InProgress)
                         throw new AppException("This status is not allowed for this service state.");
+
+                    serviceRequest.CompletionDate = DateTime.UtcNow;
                     break;
 
                 case Status.Cancelled:
