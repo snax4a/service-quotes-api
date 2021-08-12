@@ -42,6 +42,7 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.Or(p => p.Customer.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
                 predicate = predicate.Or(p => p.Address.Street.ToLower().Contains(filter.SearchString.ToLower()));
                 predicate = predicate.Or(p => p.Address.City.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Address.ZipCode.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             if (account.Role == Role.Customer)
