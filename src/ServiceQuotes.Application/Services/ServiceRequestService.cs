@@ -292,6 +292,10 @@ namespace ServiceQuotes.Application.Services
             if (serviceRequest is null)
                 throw new KeyNotFoundException("Service does not exist.");
 
+            Status[] notAllowedStatuses =  { Status.Completed, Status.Cancelled };
+            if (notAllowedStatuses.Contains(serviceRequest.Status))
+                throw new AppException("Service is in {0} status and cannot be updated.", serviceRequest.Status);
+
             // update
             if (dto.CustomerId is not null && serviceRequest.CustomerId != dto.CustomerId)
                 serviceRequest.CustomerId = dto.CustomerId ?? serviceRequest.CustomerId;
