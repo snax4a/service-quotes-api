@@ -180,6 +180,10 @@ namespace ServiceQuotes.Application.Services
 
             if (dto.Image?.Length > 0)
             {
+                int ALLOWED_FILE_SIZE = 3 * 1024 * 1024; // ~= 3 MB
+                if (dto.Image.Length > ALLOWED_FILE_SIZE)
+                    throw new AppException("Image size is too big.");
+
                 var isValidImage = Utilities.IsValidImage(dto.Image);
 
                 if (!isValidImage)
