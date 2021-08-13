@@ -5,6 +5,7 @@ using ServiceQuotes.Application.DTOs.Paynow;
 using ServiceQuotes.Application.Filters;
 using ServiceQuotes.Application.Interfaces;
 using ServiceQuotes.Domain.Entities.Enums;
+using ServiceQuotes.Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,10 +15,12 @@ namespace ServiceQuotes.Api.Controllers
     public class PaymentsController : BaseController<PaymentsController>
     {
         private readonly IPaymentService _paymentService;
+        private readonly ICustomerRepository _customerRepository;
 
-        public PaymentsController(IPaymentService paymentService)
+        public PaymentsController(IPaymentService paymentService, ICustomerRepository customerRepository)
         {
             _paymentService = paymentService;
+            _customerRepository = customerRepository;
         }
 
         [Authorize(Role.Manager, Role.Customer)]
@@ -38,6 +41,14 @@ namespace ServiceQuotes.Api.Controllers
 
             if (payment is null) return NotFound();
 
+            // customer can get only his own payments
+            if (Account.Role == Role.Customer)
+            {
+                var customer = await _customerRepository.GetByAccountId(Account.Id);
+                if (payment.CustomerId != customer.Id)
+                    return Unauthorized(new { message = "Unauthorized" });
+            }
+
             return Ok(payment);
         }
 
@@ -51,6 +62,14 @@ namespace ServiceQuotes.Api.Controllers
             var payment = await _paymentService.GetPaymentByTransactionId(transactionId);
 
             if (payment is null) return NotFound();
+
+            // customer can get only his own payments
+            if (Account.Role == Role.Customer)
+            {
+                var customer = await _customerRepository.GetByAccountId(Account.Id);
+                if (payment.CustomerId != customer.Id)
+                    return Unauthorized(new { message = "Unauthorized" });
+            }
 
             return Ok(payment);
         }

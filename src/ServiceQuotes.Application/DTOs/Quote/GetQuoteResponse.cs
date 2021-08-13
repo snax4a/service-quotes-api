@@ -8,6 +8,7 @@ namespace ServiceQuotes.Application.DTOs.Quote
         public int ReferenceNumber { get; set; }
         public decimal Total { get; set; }
         public string Status { get; set; }
+        public Guid ServiceRequestId { get; set; }
         public DateTime Created { get; set; }
     }
 }
