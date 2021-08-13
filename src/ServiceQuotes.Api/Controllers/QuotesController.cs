@@ -48,16 +48,23 @@ namespace ServiceQuotes.Api.Controllers
             return Ok(await _quoteService.GetTopUnpaidQuotes(filter));
         }
 
-        [Authorize]
+        [Authorize(Role.Manager, Role.Customer)]
         [HttpGet("{id:guid}")]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(typeof(GetQuoteResponse), 200)]
-        public async Task<ActionResult<GetQuoteResponse>> GetQuoteById(Guid id)
+        [ProducesResponseType(typeof(GetQuoteWithServiceDetailsResponse), 200)]
+        public async Task<ActionResult<GetQuoteWithServiceDetailsResponse>> GetQuoteById(Guid id)
         {
             var quote = await _quoteService.GetQuoteById(id);
 
             if (quote is null) return NotFound();
+
+            // customer can get only his own quotes
+            if (Account.Role == Role.Customer)
+            {
+                if (quote.ServiceRequest.Customer.AccountId != Account.Id)
+                    return Unauthorized(new { message = "Unauthorized" });
+            }
 
             return Ok(quote);
         }
