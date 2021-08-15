@@ -28,3 +28,14 @@ services:
       - db
     networks:
       - localdev
+
+  pgbackups:
+    container_name: Backup
+    image: prodrigestivill/postgres-backup-local
+    restart: unless-stopped
+    volumes:
+      - ./backup:/backups
+    depends_on:
+      - db
+    networks:
+      - localdev

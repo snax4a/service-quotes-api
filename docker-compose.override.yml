@@ -22,3 +22,16 @@ services:
       - ./https:/https/:ro
     networks:
       - localdev
+
+  pgbackups:
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=sq_db
+      - POSTGRES_USER=service_quotes
+      - POSTGRES_PASSWORD=DevDbPassword123
+      - POSTGRES_EXTRA_OPTS=-Z9 --schema=public --blobs
+      - SCHEDULE=@daily
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=81
