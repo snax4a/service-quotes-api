@@ -401,6 +401,11 @@ namespace ServiceQuotes.Application.Services
             if (material is null)
                 throw new KeyNotFoundException("Material does not exist.");
 
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(material.ServiceRequestId);
+
+            if (serviceRequest.Status != Status.InProgress)
+                throw new AppException("This service is not in progress.");
+
             _unitOfWork.Materials.Remove(material);
             _unitOfWork.Commit();
         }
@@ -497,6 +502,11 @@ namespace ServiceQuotes.Application.Services
             // validate
             if (jobValuation is null)
                 throw new KeyNotFoundException("JobValuation does not exist.");
+
+            var serviceRequest = await _unitOfWork.ServiceRequests.Get(serviceRequestId);
+
+            if (serviceRequest.Status != Status.InProgress)
+                throw new AppException("This service is not in progress.");
 
             _unitOfWork.ServiceRequestJobValuations.Remove(jobValuation);
             _unitOfWork.Commit();
