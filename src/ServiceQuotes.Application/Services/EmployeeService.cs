@@ -43,6 +43,11 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.And(p => p.EmployeeSpecializations.Any(x => x.SpecializationId == specializationId));
             }
 
+            if (filter?.Role is not null)
+            {
+                predicate = predicate.And(p => p.Account.Role == filter.Role);
+            }
+
             var employees = await _unitOfWork.Employees.FindWithSpecializations(predicate);
 
             return employees.Select(employee => new GetEmployeeWithAccountImageResponse()
