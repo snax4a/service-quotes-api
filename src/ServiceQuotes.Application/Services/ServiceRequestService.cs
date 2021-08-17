@@ -297,20 +297,27 @@ namespace ServiceQuotes.Application.Services
                 throw new AppException("Service is in {0} status and cannot be updated.", serviceRequest.Status);
 
             // update
-            if (dto.CustomerId is not null && serviceRequest.CustomerId != dto.CustomerId)
-                serviceRequest.CustomerId = dto.CustomerId ?? serviceRequest.CustomerId;
+            if (serviceRequest.Status == Status.Assigned || serviceRequest.Status == Status.InProgress)
+            {
+                if (dto.PlannedExecutionDate is not null && serviceRequest.PlannedExecutionDate != dto.PlannedExecutionDate)
+                    serviceRequest.PlannedExecutionDate = dto.PlannedExecutionDate;
+            }
 
-            if (dto.AddressId is not null && serviceRequest.AddressId != dto.AddressId)
-                serviceRequest.AddressId = dto.AddressId ?? serviceRequest.AddressId;
+            // only planned execution date can be set in inprogress status
+            if (serviceRequest.Status != Status.InProgress)
+            {
+                if (dto.CustomerId is not null && serviceRequest.CustomerId != dto.CustomerId)
+                    serviceRequest.CustomerId = dto.CustomerId ?? serviceRequest.CustomerId;
 
-            if (!string.IsNullOrEmpty(dto.Title) && serviceRequest.Title != dto.Title)
-                serviceRequest.Title = dto.Title;
+                if (dto.AddressId is not null && serviceRequest.AddressId != dto.AddressId)
+                    serviceRequest.AddressId = dto.AddressId ?? serviceRequest.AddressId;
 
-            if (!string.IsNullOrEmpty(dto.Description) && serviceRequest.Description != dto.Description)
-                serviceRequest.Description = dto.Description;
+                if (!string.IsNullOrEmpty(dto.Title) && serviceRequest.Title != dto.Title)
+                    serviceRequest.Title = dto.Title;
 
-            if (dto.PlannedExecutionDate is not null && serviceRequest.PlannedExecutionDate != dto.PlannedExecutionDate)
-                serviceRequest.PlannedExecutionDate = dto.PlannedExecutionDate;
+                if (!string.IsNullOrEmpty(dto.Description) && serviceRequest.Description != dto.Description)
+                    serviceRequest.Description = dto.Description;
+            }
 
             _unitOfWork.Commit();
 
