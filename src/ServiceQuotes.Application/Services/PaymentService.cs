@@ -54,9 +54,19 @@ namespace ServiceQuotes.Application.Services
 
             if (!string.IsNullOrEmpty(filter?.SearchString))
             {
-                predicate = predicate.Or(p => p.Provider.ToLower().Contains(filter.SearchString.ToLower()));
-                predicate = predicate.Or(p => p.TransactionId.ToLower().Contains(filter.SearchString.ToLower()));
-                predicate = predicate.Or(p => p.Amount.ToString().ToLower().Contains(filter.SearchString.ToLower()));
+                // Special case for Quote Ref Number. Quote Ref Number is displayed with # to the end user.
+                if (filter.SearchString.StartsWith("#"))
+                {
+                    // If searchString starts with # it gives a sign that user wants to search by Quote Ref Number.
+                    // We need to remove # since it is not stored in DB.
+                    predicate = predicate.Or(p => p.Quote.ReferenceNumber.ToString().ToLower().Contains(filter.SearchString.Remove(0,1).ToLower()));
+                } else
+                {
+                    predicate = predicate.Or(p => p.Provider.ToLower().Contains(filter.SearchString.ToLower()));
+                    predicate = predicate.Or(p => p.TransactionId.ToLower().Contains(filter.SearchString.ToLower()));
+                    predicate = predicate.Or(p => p.Amount.ToString().ToLower().Contains(filter.SearchString.ToLower()));
+                    predicate = predicate.Or(p => p.Customer.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
+                }
             }
 
             if (account.Role == Role.Customer)

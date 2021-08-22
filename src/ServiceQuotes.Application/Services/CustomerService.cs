@@ -34,6 +34,7 @@ namespace ServiceQuotes.Application.Services
             {
                 predicate = predicate.Or(p => p.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
                 predicate = predicate.Or(p => p.VatNumber.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Id.ToString().ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             var customers = await _unitOfWork.Customers.FindWithAccount(predicate);

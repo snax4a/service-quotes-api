@@ -38,6 +38,7 @@ namespace ServiceQuotes.Application.Services
                 predicate = predicate.Or(p => p.ServiceRequest.Customer.CompanyName.ToLower().Contains(filter.SearchString.ToLower()));
                 predicate = predicate.Or(p => p.ServiceRequest.Address.Street.ToLower().Contains(filter.SearchString.ToLower()));
                 predicate = predicate.Or(p => p.ServiceRequest.Address.City.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.ServiceRequest.Address.ZipCode.ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(filter?.DateRange))
