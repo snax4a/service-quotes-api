@@ -39,6 +39,7 @@ namespace ServiceQuotes.Application.Services
             if (!string.IsNullOrEmpty(filter?.SearchString))
             {
                 predicate = predicate.Or(p => p.Email.ToLower().Contains(filter.SearchString.ToLower()));
+                predicate = predicate.Or(p => p.Id.ToString().ToLower().Contains(filter.SearchString.ToLower()));
             }
 
             if (filter?.Role is not null)
