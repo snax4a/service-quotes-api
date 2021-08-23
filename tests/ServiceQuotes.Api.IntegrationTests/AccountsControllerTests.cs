@@ -54,42 +54,6 @@ namespace ServiceQuotes.Api.IntegrationTests
             Assert.Equal("Unauthorized", json["message"]);
         }
 
-        [Fact]
-        public async Task Get_ExistingAccountsWithFilter_ReturnsOk()
-        {
-            // Arrange
-            var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
-            var client = _factory.RebuildDb().CreateClientWithAuth(accountId);
-
-            // Act
-            var response = await client.GetAsync("/api/accounts?searchString=customer@test.com");
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            string json = await response.Content.ReadAsStringAsync();
-            var array = JArray.Parse(json);
-            array.HasValues.Should().BeTrue();
-            array.Should().OnlyHaveUniqueItems();
-            array.Should().ContainSingle();
-        }
-
-        [Fact]
-        public async Task Get_NonExistingAccountsWithFilter_ReturnsOk()
-        {
-            // Arrange
-            var accountId = Guid.Parse("be95846f-6298-45eb-b732-dddadb2e4f83");
-            var client = _factory.RebuildDb().CreateClientWithAuth(accountId);
-
-            // Act
-            var response = await client.GetAsync("/api/accounts?searchString=not.existing@email.com");
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            string json = await response.Content.ReadAsStringAsync();
-            var array = JArray.Parse(json);
-            array.Should().BeEmpty();
-        }
-
         [Theory]
         [InlineData("8720c542-7784-460a-91ca-31bf633eae50")]
         [InlineData("8411910e-5d47-40fb-a29b-6ad9dbbd9f63")]
